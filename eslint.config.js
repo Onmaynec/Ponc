@@ -4,6 +4,7 @@ const browserGlobals = {
   console: 'readonly',
   requestAnimationFrame: 'readonly',
   HTMLCanvasElement: 'readonly',
+  URL: 'readonly',
   __APP_VERSION__: 'readonly',
 };
 
