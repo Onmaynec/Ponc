@@ -1,0 +1,37 @@
+name: Release Ponc 1.1.0
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Resolve version
+        id: version
+        run: echo "value=$(node -p \"require('./package.json').version\")" >> "$GITHUB_OUTPUT"
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            echo "Release v${VERSION} already exists."
+            exit 0
+          fi
+          gh release create "v${VERSION}" \
+            --target "$GITHUB_SHA" \
+            --title "Ponc ${VERSION} — Stable Core" \
+            --notes "Stable Core: модульное ES Modules ядро, fixed timestep, автоматические unit/integration/E2E проверки и GitHub Actions CI. Подробности приведены в CHANGELOG.md."
+      - name: Remove merged feature branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/feature/1.1.0-stable-core" || true
