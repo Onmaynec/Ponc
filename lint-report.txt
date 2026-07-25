@@ -3,12 +3,8 @@
 > eslint .
 
 
-/home/runner/work/Ponc/Ponc/script.js
-  45:5  error  'keys' is never reassigned. Use 'const' instead  prefer-const
-
 /home/runner/work/Ponc/Ponc/vite.config.js
   5:20  error  'URL' is not defined  no-undef
 
-✖ 2 problems (2 errors, 0 warnings)
-  1 error and 0 warnings potentially fixable with the `--fix` option.
+✖ 1 problem (1 error, 0 warnings)
 
