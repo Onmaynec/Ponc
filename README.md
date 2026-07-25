@@ -42,7 +42,7 @@ Vite выведет адрес локального dev server. Прямое о�
 | `npm test` | Все core/unit/integration тесты Node.js |
 | `npm run test:e2e` | Playwright smoke-тесты |
 
-Версии Vite, ESLint, Prettier и Playwright закреплены непосредственно в npm scripts. Это сохраняет воспроизводимость при минимальном lockfile и не добавляет runtime-зависимостей приложению.
+Версии Vite, ESLint, Prettier и Playwright зафиксированы в `devDependencies` и `package-lock.json`. Runtime-зависимости у приложения отсутствуют.
 
 ## Управление
 
@@ -90,7 +90,7 @@ npm run lint
 npm run format:check
 npm test
 npm run build
-npx --yes --package=@playwright/test@1.61.1 playwright install chromium
+npx playwright install chromium
 npm run test:e2e
 ```
 
