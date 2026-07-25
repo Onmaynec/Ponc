@@ -1,6 +1,0 @@
-
-Running 2 tests using 1 worker
-
-[1/2] [chromium] › e2e/game.spec.js:3:1 › loads, starts, pauses, resumes and resets a match
-[2/2] [chromium] › e2e/game.spec.js:31:1 › renders at a 320 px mobile viewport without fatal initialization errors
-  2 passed (2.2s)
