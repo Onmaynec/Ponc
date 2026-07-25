@@ -18,10 +18,10 @@ test('loads, starts, pauses, resumes and resets a match', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(page.locator('html')).toHaveAttribute('data-game-state', 'PAUSED');
 
-  await page.getByRole('button', { name: 'Продолжить' }).click();
+  await page.locator('#resumeButton').click();
   await expect(page.locator('html')).toHaveAttribute('data-game-state', 'COUNTDOWN');
 
-  await page.getByRole('button', { name: 'Начать заново' }).last().click();
+  await page.locator('#restartButton').click();
   await expect(page.locator('html')).toHaveAttribute('data-game-state', 'COUNTDOWN');
   await expect(page.locator('#playerScore')).toHaveText('0');
   await expect(page.locator('#aiScore')).toHaveText('0');
