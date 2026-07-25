@@ -3,9 +3,14 @@ name: Release Ponc 1.1.0
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release-ponc-1.1.0
+  cancel-in-progress: false
 
 jobs:
   release:
