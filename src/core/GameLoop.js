@@ -1,7 +1,12 @@
 import { FixedStepAccumulator } from './FixedStepAccumulator.js';
 
 export class GameLoop {
-  constructor({ config, update, render, requestFrame = requestAnimationFrame }) {
+  constructor({
+    config,
+    update,
+    render,
+    requestFrame = (callback) => window.requestAnimationFrame(callback),
+  }) {
     this.update = update;
     this.render = render;
     this.requestFrame = requestFrame;
