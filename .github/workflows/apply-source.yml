@@ -3,13 +3,15 @@ name: Apply Stable Core source
 on:
   push:
     branches: [feature/1.1.0-stable-core]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   apply:
-    if: github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]' && (github.event_name == 'push' || github.head_ref == 'feature/1.1.0-stable-core')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
