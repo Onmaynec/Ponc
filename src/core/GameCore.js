@@ -155,8 +155,7 @@ export class GameCore {
     const direction = this.random() >= 0.5 ? 1 : -1;
     this.model.ball.x = this.config.field.width / 2;
     this.model.ball.y = this.config.field.height / 2;
-    this.model.ball.vx =
-      this.config.ball.initialSpeed * direction * Math.cos(angle);
+    this.model.ball.vx = this.config.ball.initialSpeed * direction * Math.cos(angle);
     this.model.ball.vy = this.config.ball.initialSpeed * Math.sin(angle);
   }
 

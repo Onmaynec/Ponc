@@ -21,7 +21,7 @@ export default [
     },
     rules: {
       'constructor-super': 'error',
-      'eqeqeq': ['error', 'always'],
+      eqeqeq: ['error', 'always'],
       'no-const-assign': 'error',
       'no-debugger': 'error',
       'no-dupe-class-members': 'error',

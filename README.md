@@ -31,16 +31,16 @@ Vite выведет адрес локального dev server. Прямое о�
 
 ## Команды
 
-| Команда | Назначение |
-| --- | --- |
-| `npm run dev` | Vite dev server |
-| `npm run build` | Production-сборка в `dist/` |
-| `npm run preview` | Локальный просмотр production-сборки |
-| `npm run lint` | Статический анализ ESLint |
-| `npm run format` | Форматирование Prettier |
+| Команда                | Назначение                                   |
+| ---------------------- | -------------------------------------------- |
+| `npm run dev`          | Vite dev server                              |
+| `npm run build`        | Production-сборка в `dist/`                  |
+| `npm run preview`      | Локальный просмотр production-сборки         |
+| `npm run lint`         | Статический анализ ESLint                    |
+| `npm run format`       | Форматирование Prettier                      |
 | `npm run format:check` | Проверка форматирования без изменения файлов |
-| `npm test` | Все core/unit/integration тесты Node.js |
-| `npm run test:e2e` | Playwright smoke-тесты |
+| `npm test`             | Все core/unit/integration тесты Node.js      |
+| `npm run test:e2e`     | Playwright smoke-тесты                       |
 
 Версии Vite, ESLint, Prettier и Playwright зафиксированы в `devDependencies` и `package-lock.json`. Runtime-зависимости у приложения отсутствуют.
 

@@ -39,10 +39,7 @@ export class PhysicsSystem {
     if (ball.y - ball.radius <= 0 && ball.vy < 0) {
       ball.y = ball.radius;
       ball.vy = Math.abs(ball.vy);
-    } else if (
-      ball.y + ball.radius >= this.config.field.height &&
-      ball.vy > 0
-    ) {
+    } else if (ball.y + ball.radius >= this.config.field.height && ball.vy > 0) {
       ball.y = this.config.field.height - ball.radius;
       ball.vy = -Math.abs(ball.vy);
     }
@@ -59,11 +56,7 @@ export class PhysicsSystem {
       this.config.ball.maximumSpeed,
     );
     const paddleCenter = paddle.y + paddle.height / 2;
-    const collisionRatio = clamp(
-      (ball.y - paddleCenter) / (paddle.height / 2),
-      -1,
-      1,
-    );
+    const collisionRatio = clamp((ball.y - paddleCenter) / (paddle.height / 2), -1, 1);
     const angle = collisionRatio * this.config.ball.maximumBounceAngle;
     const direction = isPlayer ? 1 : -1;
 
@@ -84,9 +77,7 @@ export class PhysicsSystem {
 
     ball.vx = vx;
     ball.vy = vy;
-    ball.x = isPlayer
-      ? paddle.x + paddle.width + ball.radius
-      : paddle.x - ball.radius;
+    ball.x = isPlayer ? paddle.x + paddle.width + ball.radius : paddle.x - ball.radius;
     return true;
   }
 

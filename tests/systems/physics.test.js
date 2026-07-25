@@ -56,10 +56,7 @@ test('reflects from both paddles only while moving toward them', () => {
   model.ball.x = model.paddles.ai.x;
   model.ball.y = model.paddles.ai.y + model.paddles.ai.height / 2;
   model.ball.vx = GAME_CONFIG.ball.initialSpeed;
-  assert.equal(
-    physics.resolvePaddleCollision(model.ball, model.paddles.ai, 'ai'),
-    true,
-  );
+  assert.equal(physics.resolvePaddleCollision(model.ball, model.paddles.ai, 'ai'), true);
   assert.ok(model.ball.vx < 0);
 });
 
@@ -76,9 +73,7 @@ test('enforces maximum speed, horizontal minimum and bounce angle', () => {
   const speed = Math.hypot(model.ball.vx, model.ball.vy);
   const angle = Math.abs(Math.atan2(model.ball.vy, model.ball.vx));
   assert.ok(speed <= GAME_CONFIG.ball.maximumSpeed + 1e-9);
-  assert.ok(
-    Math.abs(model.ball.vx) >= GAME_CONFIG.ball.minimumHorizontalSpeed - 1e-9,
-  );
+  assert.ok(Math.abs(model.ball.vx) >= GAME_CONFIG.ball.minimumHorizontalSpeed - 1e-9);
   assert.ok(angle <= GAME_CONFIG.ball.maximumBounceAngle + 1e-9);
 });
 
@@ -92,8 +87,5 @@ test('clamps player and AI paddles to field bounds', () => {
   );
   physics.updateAI(model.paddles.ai, { direction: 1 }, 10);
   assert.equal(model.paddles.player.y, 0);
-  assert.equal(
-    model.paddles.ai.y,
-    GAME_CONFIG.field.height - GAME_CONFIG.paddle.height,
-  );
+  assert.equal(model.paddles.ai.y, GAME_CONFIG.field.height - GAME_CONFIG.paddle.height);
 });
