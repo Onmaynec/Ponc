@@ -1,0 +1,33 @@
+name: Apply Stable Core source
+
+on:
+  push:
+    branches: [feature/1.1.0-stable-core]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/1.1.0-stable-core
+      - name: Apply source bundle
+        run: |
+          cat .release-source/part-* > /tmp/source.b64
+          base64 --decode /tmp/source.b64 > /tmp/source.tar.gz
+          rm -rf src e2e tests css js
+          rm -f index.html README.md CHANGELOG.md package.json package-lock.json vite.config.js eslint.config.js playwright.config.js .prettierrc.json .prettierignore .gitignore
+          tar -xzf /tmp/source.tar.gz
+          rm -rf .release-source
+          rm -f .github/workflows/apply-source.yml
+      - name: Commit modular core
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "refactor: introduce modular stable core"
+          git push
