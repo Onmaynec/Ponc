@@ -3,6 +3,8 @@ name: Release Ponc 1.1.0
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -14,6 +16,7 @@ concurrency:
 
 jobs:
   release:
+    if: github.event_name != 'pull_request' || github.head_ref == 'release/1.1.0-publish'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,27 +35,30 @@ jobs:
           VERSION: ${{ steps.version.outputs.value }}
         run: |
           set +e
+          target_sha=$(git rev-parse HEAD)
           if gh release view "v${VERSION}" >/dev/null 2>&1; then
             result="existing"
             exit_code=0
           else
             gh release create "v${VERSION}" \
-              --target "$GITHUB_SHA" \
+              --target "$target_sha" \
               --title "Ponc ${VERSION} — Stable Core" \
               --notes "Stable Core: модульное ES Modules ядро, fixed timestep, автоматические unit/integration/E2E проверки и GitHub Actions CI. Подробности приведены в CHANGELOG.md."
             exit_code=$?
             if [ "$exit_code" -eq 0 ]; then result="created"; else result="failed"; fi
           fi
           tag_sha=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/v${VERSION}" --jq '.object.sha' 2>/dev/null || true)
-          printf '{\n  "version": "%s",\n  "result": "%s",\n  "tagSha": "%s",\n  "workflowSha": "%s"\n}\n' "$VERSION" "$result" "$tag_sha" "$GITHUB_SHA" > .release-status-1.1.0.json
+          printf '{\n  "version": "%s",\n  "result": "%s",\n  "tagSha": "%s",\n  "workflowSha": "%s"\n}\n' "$VERSION" "$result" "$tag_sha" "$target_sha" > .release-status-1.1.0.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .release-status-1.1.0.json
           git diff --cached --quiet || git commit -m "chore: record 1.1.0 release status"
           git push origin HEAD:main
           exit "$exit_code"
-      - name: Remove merged feature branch
+      - name: Remove merged work branches
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/feature/1.1.0-stable-core" || true
+        run: |
+          gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/feature/1.1.0-stable-core" || true
+          gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/release/1.1.0-publish" || true
