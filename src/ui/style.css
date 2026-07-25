@@ -457,3 +457,21 @@ canvas {
 .state-badge[hidden] {
     display: none;
 }
+
+.fatal-error {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid rgba(255, 90, 90, 0.8);
+  border-radius: 12px;
+  background: rgba(120, 0, 0, 0.35);
+  color: #fff;
+  text-align: center;
+}
+
+.version-info {
+  margin-top: 18px;
+  text-align: center;
+  color: #b0d4ff;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
