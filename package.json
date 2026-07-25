@@ -5,23 +5,17 @@
   "type": "module",
   "description": "A modular browser Pong game with deterministic fixed-step gameplay.",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "dev": "npx --yes vite@8.1.5",
+    "build": "npx --yes vite@8.1.5 build",
+    "preview": "npx --yes vite@8.1.5 preview",
+    "lint": "npx --yes eslint@10.7.0 .",
+    "format": "npx --yes prettier@3.9.6 --write .",
+    "format:check": "npx --yes prettier@3.9.6 --check .",
     "test": "node --test",
     "test:unit": "node --test tests",
-    "test:e2e": "playwright test"
+    "test:e2e": "npx --yes --package=@playwright/test@1.61.1 playwright test"
   },
   "engines": {
     "node": ">=22.12.0"
-  },
-  "devDependencies": {
-    "@playwright/test": "1.61.1",
-    "eslint": "10.7.0",
-    "prettier": "3.9.6",
-    "vite": "8.1.5"
   }
 }
