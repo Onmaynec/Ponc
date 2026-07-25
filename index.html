@@ -1,110 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1e3c72">
-    <title>Ponc 1.0.1 — Pong Game</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1e3c72" />
+    <title>Ponc 1.1.0 — Pong Game</title>
+    <link rel="stylesheet" href="/src/ui/style.css" />
+  </head>
+  <body>
     <main class="container">
-        <header class="header">
-            <h1>🎮 Ponc</h1>
-            <p class="subtitle">Классическая игра Pong</p>
-        </header>
+      <div class="fatal-error" id="fatalError" role="alert" hidden></div>
 
-        <section class="game-area" aria-label="Игровая область Ponc">
-            <div class="game-stage" id="gameStage">
-                <canvas
-                    id="gameCanvas"
-                    width="800"
-                    height="400"
-                    tabindex="0"
-                    aria-label="Поле игры Pong. Управляйте левой ракеткой мышью или стрелками."
-                ></canvas>
+      <header class="header">
+        <h1>🎮 Ponc</h1>
+        <p class="subtitle">Классическая игра Pong</p>
+      </header>
 
-                <div class="game-overlay" id="menuOverlay">
-                    <div class="overlay-card">
-                        <p class="overlay-kicker">Ponc 1.0.1</p>
-                        <h2>Готовы к матчу?</h2>
-                        <p>Первый участник, набравший 11 очков, побеждает.</p>
-                        <button class="button button-primary" id="startButton" type="button">Начать матч</button>
-                    </div>
-                </div>
+      <section class="game-area" aria-label="Игровая область Ponc">
+        <div class="game-stage" id="gameStage">
+          <canvas
+            id="gameCanvas"
+            width="800"
+            height="400"
+            tabindex="0"
+            aria-label="Поле игры Pong. Управляйте левой ракеткой мышью или стрелками."
+          ></canvas>
 
-                <div class="game-overlay" id="pauseOverlay" hidden>
-                    <div class="overlay-card">
-                        <p class="overlay-kicker">Матч приостановлен</p>
-                        <h2>Пауза</h2>
-                        <p>Продолжите игру, перезапустите матч или вернитесь в меню.</p>
-                        <div class="overlay-actions">
-                            <button class="button button-primary" id="resumeButton" type="button">Продолжить</button>
-                            <button class="button button-secondary" id="pauseRestartButton" type="button">Начать заново</button>
-                            <button class="button button-ghost" id="pauseMenuButton" type="button">В главное меню</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="game-overlay" id="gameOverOverlay" hidden>
-                    <div class="overlay-card">
-                        <p class="overlay-kicker">Матч завершён</p>
-                        <h2 id="resultTitle">Победа</h2>
-                        <p id="resultScore">Финальный счёт: 0:0</p>
-                        <div class="overlay-actions">
-                            <button class="button button-primary" id="replayButton" type="button">Повторить матч</button>
-                            <button class="button button-ghost" id="gameOverMenuButton" type="button">В главное меню</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="countdown" id="countdown" hidden aria-live="assertive">2</div>
-                <div class="state-badge" id="stateBadge" aria-live="polite">Меню</div>
+          <div class="game-overlay" id="menuOverlay">
+            <div class="overlay-card">
+              <p class="overlay-kicker">Ponc <span data-app-version>1.1.0</span></p>
+              <h2>Готовы к матчу?</h2>
+              <p>Первый участник, набравший 11 очков, побеждает.</p>
+              <button class="button button-primary" id="startButton" type="button">
+                Начать матч
+              </button>
             </div>
+          </div>
 
-            <div class="game-toolbar" aria-label="Управление матчем">
-                <button class="button button-secondary" id="pauseButton" type="button" disabled>Пауза</button>
-                <button class="button button-secondary" id="restartButton" type="button">Начать заново</button>
+          <div class="game-overlay" id="pauseOverlay" hidden>
+            <div class="overlay-card">
+              <p class="overlay-kicker">Матч приостановлен</p>
+              <h2>Пауза</h2>
+              <p>Продолжите игру, перезапустите матч или вернитесь в меню.</p>
+              <div class="overlay-actions">
+                <button class="button button-primary" id="resumeButton" type="button">
+                  Продолжить
+                </button>
+                <button
+                  class="button button-secondary"
+                  id="pauseRestartButton"
+                  type="button"
+                >
+                  Начать заново
+                </button>
+                <button class="button button-ghost" id="pauseMenuButton" type="button">
+                  В главное меню
+                </button>
+              </div>
             </div>
-        </section>
+          </div>
 
-        <section class="scoreboard" aria-label="Счёт матча">
-            <div class="score-player">
-                <span class="score-label">Вы</span>
-                <span class="score-value" id="playerScore">0</span>
+          <div class="game-overlay" id="gameOverOverlay" hidden>
+            <div class="overlay-card">
+              <p class="overlay-kicker">Матч завершён</p>
+              <h2 id="resultTitle">Победа</h2>
+              <p id="resultScore">Финальный счёт: 0:0</p>
+              <div class="overlay-actions">
+                <button class="button button-primary" id="replayButton" type="button">
+                  Повторить матч
+                </button>
+                <button class="button button-ghost" id="gameOverMenuButton" type="button">
+                  В главное меню
+                </button>
+              </div>
             </div>
-            <div class="vs">VS</div>
-            <div class="score-ai">
-                <span class="score-label">Компьютер</span>
-                <span class="score-value" id="aiScore">0</span>
-            </div>
-        </section>
+          </div>
 
-        <section class="controls" aria-label="Подсказки по управлению">
-            <div class="control-item">
-                <span class="control-label">🖱️ Мышь</span>
-                <span class="control-desc">Движение ракетки</span>
-            </div>
-            <div class="control-item">
-                <span class="control-label">⬆️ ⬇️ Стрелки</span>
-                <span class="control-desc">Управление ракеткой</span>
-            </div>
-            <div class="control-item">
-                <span class="control-label">Esc</span>
-                <span class="control-desc">Пауза / продолжить</span>
-            </div>
-            <div class="control-item">
-                <span class="control-label">R</span>
-                <span class="control-desc">Начать заново</span>
-            </div>
-        </section>
+          <div class="countdown" id="countdown" hidden aria-live="assertive">2</div>
+          <div class="state-badge" id="stateBadge" aria-live="polite">Меню</div>
+        </div>
 
-        <section class="info">
-            <p>Управляйте левой ракеткой и не дайте мячу пройти.</p>
-            <p class="tip">Последний использованный способ ввода — мышь или клавиатура — остаётся активным.</p>
-        </section>
+        <div class="game-toolbar" aria-label="Управление матчем">
+          <button class="button button-secondary" id="pauseButton" type="button" disabled>
+            Пауза
+          </button>
+          <button class="button button-secondary" id="restartButton" type="button">
+            Начать заново
+          </button>
+        </div>
+      </section>
+
+      <section class="scoreboard" aria-label="Счёт матча">
+        <div class="score-player">
+          <span class="score-label">Вы</span>
+          <span class="score-value" id="playerScore">0</span>
+        </div>
+        <div class="vs">VS</div>
+        <div class="score-ai">
+          <span class="score-label">Компьютер</span>
+          <span class="score-value" id="aiScore">0</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Подсказки по управлению">
+        <div class="control-item">
+          <span class="control-label">🖱️ Мышь</span>
+          <span class="control-desc">Движение ракетки</span>
+        </div>
+        <div class="control-item">
+          <span class="control-label">⬆️ ⬇️ Стрелки</span>
+          <span class="control-desc">Управление ракеткой</span>
+        </div>
+        <div class="control-item">
+          <span class="control-label">Esc</span>
+          <span class="control-desc">Пауза / продолжить</span>
+        </div>
+        <div class="control-item">
+          <span class="control-label">R</span>
+          <span class="control-desc">Начать заново</span>
+        </div>
+      </section>
+
+      <section class="info">
+        <p>Управляйте левой ракеткой и не дайте мячу пройти.</p>
+        <p class="tip">
+          Последний использованный способ ввода — мышь или клавиатура — остаётся активным.
+        </p>
+      </section>
+
+      <p class="version-info">Версия <span data-app-version>1.1.0</span></p>
     </main>
 
-    <script src="js/game.js"></script>
-</body>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>
