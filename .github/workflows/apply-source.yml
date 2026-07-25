@@ -25,7 +25,7 @@ jobs:
           rm -f index.html README.md CHANGELOG.md package.json package-lock.json vite.config.js eslint.config.js playwright.config.js .prettierrc.json .prettierignore .gitignore
           tar -xzf /tmp/source.tar.gz
           rm -rf .release-source
-          rm -f .github/workflows/apply-source.yml
+          rm -f .github/workflows/ci.yml
       - name: Commit modular core
         run: |
           git config user.name "github-actions[bot]"
