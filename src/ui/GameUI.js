@@ -24,6 +24,8 @@ export class GameUI {
       'gameOverOverlay',
       'countdown',
       'stateBadge',
+      'difficultyBadge',
+      'difficultySelect',
       'resultTitle',
       'resultScore',
       'startButton',
@@ -63,6 +65,14 @@ export class GameUI {
       element.addEventListener('click', handler);
       this.cleanup.push(() => element.removeEventListener('click', handler));
     }
+
+    const onDifficultyChanged = (event) => {
+      actions.setAIDifficulty(event.currentTarget.value);
+    };
+    this.elements.difficultySelect.addEventListener('change', onDifficultyChanged);
+    this.cleanup.push(() =>
+      this.elements.difficultySelect.removeEventListener('change', onDifficultyChanged),
+    );
   }
 
   destroy() {
@@ -83,6 +93,9 @@ export class GameUI {
       GAME_STATES.PAUSED,
       GAME_STATES.GAME_OVER,
     ].includes(snapshot.state);
+    elements.difficultySelect.value = snapshot.aiDifficulty.id;
+    elements.difficultySelect.disabled = snapshot.state !== GAME_STATES.MENU;
+    elements.difficultyBadge.textContent = `AI: ${snapshot.aiDifficulty.label}`;
 
     const canPause = [GAME_STATES.PLAYING, GAME_STATES.COUNTDOWN].includes(
       snapshot.state,
@@ -104,6 +117,7 @@ export class GameUI {
     }
 
     document.documentElement.dataset.gameState = snapshot.state;
+    document.documentElement.dataset.aiDifficulty = snapshot.aiDifficulty.id;
   }
 
   setVersion(version) {

@@ -1,3 +1,4 @@
+import { DEFAULT_AI_DIFFICULTY, getAIDifficultyProfile } from '../config/aiDifficulty.js';
 import { GAME_CONFIG } from '../config/gameConfig.js';
 import { createBall } from '../entities/createBall.js';
 import { createPaddle } from '../entities/createPaddle.js';
@@ -8,13 +9,18 @@ import { GAME_EVENTS, GAME_STATES, INPUT_MODES } from './constants.js';
 import { GameStateMachine } from './GameStateMachine.js';
 
 export class GameCore {
-  constructor({ config = GAME_CONFIG, random = Math.random, eventBus } = {}) {
+  constructor({
+    config = GAME_CONFIG,
+    random = Math.random,
+    eventBus,
+    aiDifficulty = DEFAULT_AI_DIFFICULTY,
+  } = {}) {
     this.config = config;
     this.random = random;
     this.events = eventBus ?? new EventBus();
     this.stateMachine = new GameStateMachine(this.events);
     this.physics = new PhysicsSystem(config);
-    this.ai = new AISystem(config);
+    this.ai = new AISystem(config, { difficulty: aiDifficulty, random });
     this.pausedFromState = GAME_STATES.PLAYING;
     this.countdownRemainingSeconds = config.match.countdownSeconds;
     this.score = { player: 0, ai: 0 };
@@ -31,6 +37,13 @@ export class GameCore {
 
   get state() {
     return this.stateMachine.state;
+  }
+
+  setAIDifficulty(difficulty) {
+    if (![GAME_STATES.MENU, GAME_STATES.GAME_OVER].includes(this.state)) {
+      return false;
+    }
+    return this.ai.setDifficulty(difficulty);
   }
 
   startMatch() {
@@ -88,7 +101,7 @@ export class GameCore {
     }
     if (this.state !== GAME_STATES.PLAYING) return;
 
-    const aiCommand = this.ai.createCommand(this.getSnapshot());
+    const aiCommand = this.ai.createCommand(this.getSnapshot(), deltaSeconds);
     const goal = this.physics.update(
       this.model,
       { player: playerCommand, ai: aiCommand },
@@ -99,6 +112,7 @@ export class GameCore {
 
   beginServe() {
     this.resetBall();
+    this.ai.reset();
     this.countdownRemainingSeconds = this.config.match.countdownSeconds;
     this.stateMachine.transition(GAME_STATES.COUNTDOWN);
     this.events.emit(GAME_EVENTS.SERVE_STARTED, this.getSnapshot());
@@ -147,6 +161,7 @@ export class GameCore {
     const centerY = this.config.field.height / 2 - this.config.paddle.height / 2;
     this.model.paddles.player.y = centerY;
     this.model.paddles.ai.y = centerY;
+    this.ai.reset();
     this.resetBall();
   }
 
@@ -168,12 +183,14 @@ export class GameCore {
   }
 
   getSnapshot() {
+    const difficulty = getAIDifficultyProfile(this.ai.difficulty);
     return {
       state: this.state,
       countdownRemainingSeconds: this.countdownRemainingSeconds,
       score: { ...this.score },
       winner: this.winner,
       winningScore: this.config.match.winningScore,
+      aiDifficulty: { id: difficulty.id, label: difficulty.label },
       field: { ...this.config.field },
       ball: { ...this.model.ball },
       paddles: {

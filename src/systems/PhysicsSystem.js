@@ -28,7 +28,10 @@ export class PhysicsSystem {
   }
 
   updateAI(paddle, command, deltaSeconds) {
-    paddle.y += command.direction * this.config.paddle.aiSpeed * deltaSeconds;
+    const speed = Number.isFinite(command.speed)
+      ? command.speed
+      : this.config.paddle.aiSpeed;
+    paddle.y += command.direction * speed * deltaSeconds;
     paddle.y = clamp(paddle.y, 0, this.config.field.height - paddle.height);
   }
 
