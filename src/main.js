@@ -1,3 +1,4 @@
+import { DEFAULT_AI_DIFFICULTY, normalizeAIDifficulty } from './config/aiDifficulty.js';
 import { GAME_CONFIG } from './config/gameConfig.js';
 import { GameCore } from './core/GameCore.js';
 import { GameLoop } from './core/GameLoop.js';
@@ -6,6 +7,23 @@ import { InputSystem } from './systems/InputSystem.js';
 import { GameUI } from './ui/GameUI.js';
 
 const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.1.0';
+const AI_DIFFICULTY_STORAGE_KEY = 'ponc.aiDifficulty';
+
+function loadAIDifficulty() {
+  try {
+    return normalizeAIDifficulty(window.localStorage.getItem(AI_DIFFICULTY_STORAGE_KEY));
+  } catch {
+    return DEFAULT_AI_DIFFICULTY;
+  }
+}
+
+function saveAIDifficulty(difficulty) {
+  try {
+    window.localStorage.setItem(AI_DIFFICULTY_STORAGE_KEY, difficulty);
+  } catch {
+    // Storage can be unavailable in private or restricted browsing contexts.
+  }
+}
 
 function bootstrap() {
   const canvas = document.getElementById('gameCanvas');
@@ -13,7 +31,7 @@ function bootstrap() {
     throw new Error('Game canvas is unavailable.');
   }
 
-  const core = new GameCore();
+  const core = new GameCore({ aiDifficulty: loadAIDifficulty() });
   const renderer = new CanvasRenderer(canvas, GAME_CONFIG);
   const ui = new GameUI();
   const input = new InputSystem({
@@ -44,6 +62,10 @@ function bootstrap() {
     menu: () => {
       input.reset();
       core.returnToMenu();
+    },
+    setAIDifficulty: (difficulty) => {
+      const selectedDifficulty = core.setAIDifficulty(difficulty);
+      if (selectedDifficulty) saveAIDifficulty(selectedDifficulty);
     },
   };
 

@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#1e3c72" />
     <title>Ponc 1.1.0 — Pong Game</title>
     <link rel="stylesheet" href="/src/ui/style.css" />
+    <link rel="stylesheet" href="/src/ui/difficulty.css" />
   </head>
   <body>
     <main class="container">
@@ -31,6 +32,17 @@
               <p class="overlay-kicker">Ponc <span data-app-version>1.1.0</span></p>
               <h2>Готовы к матчу?</h2>
               <p>Первый участник, набравший 11 очков, побеждает.</p>
+              <label class="difficulty-control" for="difficultySelect">
+                <span>Сложность компьютера</span>
+                <select id="difficultySelect" name="aiDifficulty">
+                  <option value="easy">Легко</option>
+                  <option value="medium">Средне</option>
+                  <option value="hard">Сложно</option>
+                </select>
+              </label>
+              <p class="difficulty-hint">
+                Настройка сохранится и применится к следующему матчу.
+              </p>
               <button class="button button-primary" id="startButton" type="button">
                 Начать матч
               </button>
@@ -78,6 +90,9 @@
 
           <div class="countdown" id="countdown" hidden aria-live="assertive">2</div>
           <div class="state-badge" id="stateBadge" aria-live="polite">Меню</div>
+          <div class="difficulty-badge" id="difficultyBadge" aria-live="polite">
+            AI: Средне
+          </div>
         </div>
 
         <div class="game-toolbar" aria-label="Управление матчем">

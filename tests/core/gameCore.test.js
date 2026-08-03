@@ -3,8 +3,8 @@ import test from 'node:test';
 import { GameCore } from '../../src/core/GameCore.js';
 import { GAME_EVENTS, GAME_STATES } from '../../src/core/constants.js';
 
-function createCore() {
-  return new GameCore({ random: () => 0.75 });
+function createCore(options = {}) {
+  return new GameCore({ random: () => 0.75, ...options });
 }
 
 function enterPlaying(core) {
@@ -65,4 +65,15 @@ test('core does not update physics outside PLAYING', () => {
   core.pause();
   core.step(1);
   assert.equal(core.getSnapshot().ball.x, before);
+});
+
+test('applies selected AI difficulty to a new match and locks it while active', () => {
+  const core = createCore({ aiDifficulty: 'easy' });
+  assert.equal(core.getSnapshot().aiDifficulty.id, 'easy');
+  assert.equal(core.setAIDifficulty('hard'), 'hard');
+
+  enterPlaying(core);
+  assert.equal(core.getSnapshot().aiDifficulty.id, 'hard');
+  assert.equal(core.setAIDifficulty('easy'), false);
+  assert.equal(core.getSnapshot().aiDifficulty.id, 'hard');
 });
