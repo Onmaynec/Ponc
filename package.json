@@ -1,9 +1,9 @@
 {
   "name": "ponc",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
-  "description": "A modular browser Pong game with deterministic fixed-step gameplay.",
+  "description": "A modular browser Pong game with local multiplayer, configurable AI, and deterministic gameplay.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

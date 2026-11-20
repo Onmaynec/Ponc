@@ -19,23 +19,24 @@ export class PhysicsSystem {
   }
 
   updatePlayer(paddle, command, deltaSeconds) {
-    if (command.mode === INPUT_MODES.POINTER) {
+    if (command.mode === INPUT_MODES.POINTER)
       paddle.y = command.targetY - paddle.height / 2;
-    } else {
-      paddle.y += command.direction * this.config.paddle.playerSpeed * deltaSeconds;
-    }
+    else paddle.y += command.direction * this.config.paddle.playerSpeed * deltaSeconds;
     paddle.y = clamp(paddle.y, 0, this.config.field.height - paddle.height);
   }
 
   updateAI(paddle, command, deltaSeconds) {
-    paddle.y += command.direction * this.config.paddle.aiSpeed * deltaSeconds;
+    const speedFactor = Number.isFinite(command.speedFactor)
+      ? clamp(command.speedFactor, 0, 2)
+      : 1;
+    paddle.y +=
+      command.direction * this.config.paddle.aiSpeed * speedFactor * deltaSeconds;
     paddle.y = clamp(paddle.y, 0, this.config.field.height - paddle.height);
   }
 
   updateBall(ball, deltaSeconds) {
     ball.x += ball.vx * deltaSeconds;
     ball.y += ball.vy * deltaSeconds;
-
     if (ball.y - ball.radius <= 0 && ball.vy < 0) {
       ball.y = ball.radius;
       ball.vy = Math.abs(ball.vy);
@@ -49,7 +50,6 @@ export class PhysicsSystem {
     const isPlayer = side === 'player';
     const movingTowardPaddle = isPlayer ? ball.vx < 0 : ball.vx > 0;
     if (!movingTowardPaddle || !this.overlaps(ball, paddle)) return false;
-
     const speed = clamp(
       Math.hypot(ball.vx, ball.vy) + this.config.ball.speedIncrement,
       this.config.ball.initialSpeed,
@@ -59,7 +59,6 @@ export class PhysicsSystem {
     const collisionRatio = clamp((ball.y - paddleCenter) / (paddle.height / 2), -1, 1);
     const angle = collisionRatio * this.config.ball.maximumBounceAngle;
     const direction = isPlayer ? 1 : -1;
-
     let vx =
       direction *
       Math.max(
@@ -68,13 +67,11 @@ export class PhysicsSystem {
       );
     let vy = speed * Math.sin(angle);
     const resultingSpeed = Math.hypot(vx, vy);
-
     if (resultingSpeed > this.config.ball.maximumSpeed) {
       const scale = this.config.ball.maximumSpeed / resultingSpeed;
       vx *= scale;
       vy *= scale;
     }
-
     ball.vx = vx;
     ball.vy = vy;
     ball.x = isPlayer ? paddle.x + paddle.width + ball.radius : paddle.x - ball.radius;

@@ -1,4 +1,6 @@
 import { GAME_STATES } from '../core/constants.js';
+import { normalizeSettings, GAME_MODES } from '../core/MatchSettings.js';
+import { summarizeHistory } from '../core/MatchHistory.js';
 
 const STATE_LABELS = Object.freeze({
   [GAME_STATES.MENU]: 'Меню',
@@ -35,14 +37,24 @@ export class GameUI {
       'replayButton',
       'gameOverMenuButton',
       'fatalError',
+      'modeSelect',
+      'difficultySelect',
+      'winningScoreSelect',
+      'difficultyField',
+      'aiLabel',
+      'rallyValue',
+      'bestRallyValue',
+      'careerGames',
+      'careerWins',
+      'careerRate',
+      'modeHint',
     ];
     const elements = Object.fromEntries(
       ids.map((id) => [id, this.root.getElementById(id)]),
     );
     const missing = ids.filter((id) => !elements[id]);
-    if (missing.length > 0) {
+    if (missing.length > 0)
       throw new Error(`Missing required UI elements: ${missing.join(', ')}`);
-    }
     return elements;
   }
 
@@ -57,12 +69,40 @@ export class GameUI {
       ['replayButton', actions.restart],
       ['gameOverMenuButton', actions.menu],
     ];
-
     for (const [elementName, handler] of bindings) {
       const element = this.elements[elementName];
       element.addEventListener('click', handler);
       this.cleanup.push(() => element.removeEventListener('click', handler));
     }
+    const modeChanged = () => this.updateModeHint();
+    this.elements.modeSelect.addEventListener('change', modeChanged);
+    this.cleanup.push(() =>
+      this.elements.modeSelect.removeEventListener('change', modeChanged),
+    );
+    this.updateModeHint();
+  }
+
+  getSettings() {
+    return normalizeSettings({
+      mode: this.elements.modeSelect.value,
+      difficulty: this.elements.difficultySelect.value,
+      winningScore: Number(this.elements.winningScoreSelect.value),
+    });
+  }
+
+  updateModeHint() {
+    const local = this.elements.modeSelect.value === GAME_MODES.LOCAL;
+    this.elements.difficultyField.hidden = local;
+    this.elements.modeHint.textContent = local
+      ? 'Игрок 1: W / S · Игрок 2: ↑ / ↓ · игра вдвоём за одной клавиатурой.'
+      : 'Вы управляете левой ракеткой мышью или стрелками. Справа — компьютер.';
+  }
+
+  setHistory(history) {
+    const stats = summarizeHistory(history);
+    this.elements.careerGames.textContent = String(stats.games);
+    this.elements.careerWins.textContent = String(stats.wins);
+    this.elements.careerRate.textContent = `${stats.winRate}%`;
   }
 
   destroy() {
@@ -73,6 +113,10 @@ export class GameUI {
     const elements = this.elements;
     elements.playerScore.textContent = String(snapshot.score.player);
     elements.aiScore.textContent = String(snapshot.score.ai);
+    elements.aiLabel.textContent =
+      snapshot.settings.mode === GAME_MODES.LOCAL ? 'Игрок 2' : 'Компьютер';
+    elements.rallyValue.textContent = String(snapshot.rallyHits);
+    elements.bestRallyValue.textContent = String(snapshot.bestRally);
     elements.menuOverlay.hidden = snapshot.state !== GAME_STATES.MENU;
     elements.pauseOverlay.hidden = snapshot.state !== GAME_STATES.PAUSED;
     elements.gameOverOverlay.hidden = snapshot.state !== GAME_STATES.GAME_OVER;
@@ -83,33 +127,33 @@ export class GameUI {
       GAME_STATES.PAUSED,
       GAME_STATES.GAME_OVER,
     ].includes(snapshot.state);
-
     const canPause = [GAME_STATES.PLAYING, GAME_STATES.COUNTDOWN].includes(
       snapshot.state,
     );
     elements.pauseButton.disabled = !canPause && snapshot.state !== GAME_STATES.PAUSED;
     elements.pauseButton.textContent =
       snapshot.state === GAME_STATES.PAUSED ? 'Продолжить' : 'Пауза';
-
     if (snapshot.state === GAME_STATES.COUNTDOWN) {
       elements.countdown.textContent = String(
         Math.max(1, Math.ceil(snapshot.countdownRemainingSeconds)),
       );
     }
-
     if (snapshot.state === GAME_STATES.GAME_OVER) {
+      const playerWon = snapshot.winner === 'player';
       elements.resultTitle.textContent =
-        snapshot.winner === 'player' ? 'Вы победили!' : 'Победил компьютер';
-      elements.resultScore.textContent = `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}`;
+        snapshot.settings.mode === GAME_MODES.LOCAL
+          ? `Победил игрок ${playerWon ? '1' : '2'}!`
+          : playerWon
+            ? 'Вы победили!'
+            : 'Победил компьютер';
+      elements.resultScore.textContent = `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}. Лучшая серия: ${snapshot.bestRally}`;
     }
-
     document.documentElement.dataset.gameState = snapshot.state;
   }
 
   setVersion(version) {
-    for (const element of this.root.querySelectorAll('[data-app-version]')) {
+    for (const element of this.root.querySelectorAll('[data-app-version]'))
       element.textContent = version;
-    }
     document.documentElement.dataset.appVersion = version;
   }
 
