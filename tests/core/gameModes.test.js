@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { GameCore } from '../../src/core/GameCore.js';
 import { GAME_STATES, GAME_EVENTS } from '../../src/core/constants.js';
-import { normalizeSettings, RULESETS, TIME_ATTACK_SECONDS } from '../../src/core/MatchSettings.js';
+import {
+  normalizeSettings,
+  RULESETS,
+  TIME_ATTACK_SECONDS,
+} from '../../src/core/MatchSettings.js';
 
 function start(ruleset) {
   const core = new GameCore({ random: () => 0.75 });

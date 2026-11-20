@@ -6,7 +6,13 @@ import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { EventBus } from './EventBus.js';
 import { GAME_EVENTS, GAME_STATES, INPUT_MODES } from './constants.js';
 import { GameStateMachine } from './GameStateMachine.js';
-import { DEFAULT_SETTINGS, GAME_MODES, RULESETS, TIME_ATTACK_SECONDS, normalizeSettings } from './MatchSettings.js';
+import {
+  DEFAULT_SETTINGS,
+  GAME_MODES,
+  RULESETS,
+  TIME_ATTACK_SECONDS,
+  normalizeSettings,
+} from './MatchSettings.js';
 
 export class GameCore {
   constructor({ config = GAME_CONFIG, random = Math.random, eventBus } = {}) {
@@ -158,7 +164,8 @@ export class GameCore {
       (this.settings.ruleset === RULESETS.TIME_ATTACK && this.overtime) ||
       (this.settings.ruleset === RULESETS.CLASSIC &&
         this.score[side] >= this.settings.winningScore)
-    ) this.finishMatch(side);
+    )
+      this.finishMatch(side);
     else this.beginServe();
     return true;
   }

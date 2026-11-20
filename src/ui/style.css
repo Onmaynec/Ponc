@@ -540,4 +540,10 @@ kbd {
   accent-color: #50e9d5;
 }
 
-#matchClock{color:#ffcf73;font-weight:900}#matchRuleLabel{color:#57e6d2}
+#matchClock {
+  color: #ffcf73;
+  font-weight: 900;
+}
+#matchRuleLabel {
+  color: #57e6d2;
+}
