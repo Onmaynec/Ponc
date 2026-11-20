@@ -6,7 +6,7 @@ import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { EventBus } from './EventBus.js';
 import { GAME_EVENTS, GAME_STATES, INPUT_MODES } from './constants.js';
 import { GameStateMachine } from './GameStateMachine.js';
-import { DEFAULT_SETTINGS, GAME_MODES, normalizeSettings } from './MatchSettings.js';
+import { DEFAULT_SETTINGS, GAME_MODES, RULESETS, TIME_ATTACK_SECONDS, normalizeSettings } from './MatchSettings.js';
 
 export class GameCore {
   constructor({ config = GAME_CONFIG, random = Math.random, eventBus } = {}) {
@@ -23,6 +23,8 @@ export class GameCore {
     this.winner = null;
     this.rallyHits = 0;
     this.bestRally = 0;
+    this.remainingSeconds = TIME_ATTACK_SECONDS;
+    this.overtime = false;
     this.model = {
       ball: createBall(config),
       paddles: { player: createPaddle(config, 'player'), ai: createPaddle(config, 'ai') },
@@ -95,6 +97,16 @@ export class GameCore {
       return;
     }
     if (this.state !== GAME_STATES.PLAYING) return;
+    if (this.settings.ruleset === RULESETS.TIME_ATTACK && !this.overtime) {
+      this.remainingSeconds = Math.max(0, this.remainingSeconds - deltaSeconds);
+      if (this.remainingSeconds === 0) {
+        if (this.score.player !== this.score.ai) {
+          this.finishMatch(this.score.player > this.score.ai ? 'player' : 'ai');
+          return;
+        }
+        this.overtime = true;
+      }
+    }
     const aiCommand =
       this.settings.mode === GAME_MODES.LOCAL
         ? {
@@ -140,12 +152,20 @@ export class GameCore {
       throw new Error(`Unknown scoring side: ${side}`);
     this.score[side] += 1;
     this.events.emit(GAME_EVENTS.GOAL, { side, score: { ...this.score } });
-    if (this.score[side] >= this.settings.winningScore) {
-      this.winner = side;
-      this.stateMachine.transition(GAME_STATES.GAME_OVER);
-      this.events.emit(GAME_EVENTS.GAME_OVER, this.getSnapshot());
-    } else this.beginServe();
+    if (
+      this.settings.ruleset === RULESETS.SUDDEN_DEATH ||
+      (this.settings.ruleset === RULESETS.TIME_ATTACK && this.overtime) ||
+      (this.settings.ruleset === RULESETS.CLASSIC &&
+        this.score[side] >= this.settings.winningScore)
+    ) this.finishMatch(side);
+    else this.beginServe();
     return true;
+  }
+
+  finishMatch(side) {
+    this.winner = side;
+    this.stateMachine.transition(GAME_STATES.GAME_OVER);
+    this.events.emit(GAME_EVENTS.GAME_OVER, this.getSnapshot());
   }
 
   resetScores() {
@@ -154,6 +174,8 @@ export class GameCore {
     this.winner = null;
     this.rallyHits = 0;
     this.bestRally = 0;
+    this.remainingSeconds = TIME_ATTACK_SECONDS;
+    this.overtime = false;
   }
   resetPositions() {
     const centerY = this.config.field.height / 2 - this.config.paddle.height / 2;
@@ -186,6 +208,8 @@ export class GameCore {
       settings: { ...this.settings },
       rallyHits: this.rallyHits,
       bestRally: this.bestRally,
+      remainingSeconds: this.remainingSeconds,
+      overtime: this.overtime,
       field: { ...this.config.field },
       ball: { ...this.model.ball },
       paddles: {

@@ -4,15 +4,25 @@ export const DIFFICULTIES = Object.freeze({
   NORMAL: 'normal',
   HARD: 'hard',
 });
+export const RULESETS = Object.freeze({
+  CLASSIC: 'classic',
+  SUDDEN_DEATH: 'sudden',
+  TIME_ATTACK: 'timed',
+});
+export const TIME_ATTACK_SECONDS = 90;
 export const WINNING_SCORES = Object.freeze([5, 7, 11, 15]);
 export const DEFAULT_SETTINGS = Object.freeze({
   mode: GAME_MODES.SOLO,
   difficulty: DIFFICULTIES.NORMAL,
   winningScore: 11,
+  ruleset: RULESETS.CLASSIC,
 });
 
 export function normalizeSettings(input = {}) {
   return {
+    ruleset: Object.values(RULESETS).includes(input.ruleset)
+      ? input.ruleset
+      : DEFAULT_SETTINGS.ruleset,
     mode: Object.values(GAME_MODES).includes(input.mode)
       ? input.mode
       : DEFAULT_SETTINGS.mode,
