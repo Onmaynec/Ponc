@@ -16,6 +16,7 @@ export class GameUI {
     this.root = root;
     this.elements = this.collectElements();
     this.cleanup = [];
+    this.alertTimeout = null;
   }
 
   collectElements() {
@@ -39,6 +40,10 @@ export class GameUI {
       'gameOverMenuButton',
       'fatalError',
       'modeSelect',
+      'powerUpsSelect',
+      'powerUpInfo',
+      'powerUpCounter',
+      'powerUpAlert',
       'rulesetSelect',
       'winningScoreField',
       'matchClock',
@@ -88,6 +93,10 @@ export class GameUI {
     this.cleanup.push(() =>
       this.elements.modeSelect.removeEventListener('change', modeChanged),
     );
+    this.elements.powerUpsSelect.addEventListener('change', modeChanged);
+    this.cleanup.push(() =>
+      this.elements.powerUpsSelect.removeEventListener('change', modeChanged),
+    );
     this.elements.rulesetSelect.addEventListener('change', modeChanged);
     this.cleanup.push(() =>
       this.elements.rulesetSelect.removeEventListener('change', modeChanged),
@@ -131,6 +140,7 @@ export class GameUI {
     return normalizeSettings({
       mode: this.elements.modeSelect.value,
       ruleset: this.elements.rulesetSelect.value,
+      powerUps: this.elements.powerUpsSelect.value === 'on',
       difficulty: this.elements.difficultySelect.value,
       winningScore: Number(this.elements.winningScoreSelect.value),
     });
@@ -149,7 +159,10 @@ export class GameUI {
       [RULESETS.SUDDEN_DEATH]: 'Первое очко решает весь матч.',
       [RULESETS.TIME_ATTACK]: '90 секунд активной игры. При ничьей — решающее очко.',
     };
-    this.elements.modeHint.textContent = `${controls} ${rules[ruleset]}`;
+    const extras = this.elements.powerUpsSelect.value === 'on'
+      ? ' Усиления: ловите шаром капсулы, чтобы получить бонус.'
+      : '';
+    this.elements.modeHint.textContent = `${controls} ${rules[ruleset]}${extras}`;
   }
 
   setHistory(history) {
@@ -169,7 +182,22 @@ export class GameUI {
     );
   }
 
+  showPowerUp({ type, side, shield = false }) {
+    const names = { expand: 'РАКЕТКА XL', turbo: 'ТУРБО', shield: 'ЭНЕРГОЩИТ' };
+    const playerName = side === 'player' ? 'Игрок 1' : 'Игрок 2 / ИИ';
+    this.elements.powerUpAlert.textContent = shield
+      ? `${playerName} отразил удар щитом!`
+      : `${playerName}: ${names[type] ?? 'БОНУС'}!`;
+    this.elements.powerUpAlert.hidden = false;
+    if (this.alertTimeout !== null) clearTimeout(this.alertTimeout);
+    this.alertTimeout = setTimeout(() => {
+      this.elements.powerUpAlert.hidden = true;
+      this.alertTimeout = null;
+    }, 1800);
+  }
+
   destroy() {
+    if (this.alertTimeout !== null) clearTimeout(this.alertTimeout);
     for (const dispose of this.cleanup.splice(0)) dispose();
   }
 
@@ -181,6 +209,23 @@ export class GameUI {
       snapshot.settings.mode === GAME_MODES.LOCAL ? 'Игрок 2' : 'Компьютер';
     elements.rallyValue.textContent = String(snapshot.rallyHits);
     elements.bestRallyValue.textContent = String(snapshot.bestRally);
+    elements.powerUpInfo.hidden = !snapshot.powerUps.enabled;
+    if (snapshot.powerUps.enabled) {
+      const buffs = [];
+      for (const side of ['player', 'ai']) {
+        const label = side === 'player' ? 'P1' : 'P2';
+        if (snapshot.powerUps.expand[side] > 0)
+          buffs.push(`${label} XL ${Math.ceil(snapshot.powerUps.expand[side])}с`);
+        if (snapshot.powerUps.shield[side] > 0)
+          buffs.push(`${label} ЩИТ ${Math.ceil(snapshot.powerUps.shield[side])}с`);
+      }
+      elements.powerUpInfo.textContent = buffs.length
+        ? buffs.join(' · ')
+        : 'Собирайте капсулы мячом';
+      elements.powerUpCounter.textContent = String(
+        snapshot.powerUps.collected.player + snapshot.powerUps.collected.ai,
+      );
+    }
     elements.matchRuleLabel.textContent = {
       [RULESETS.CLASSIC]: 'КЛАССИКА',
       [RULESETS.SUDDEN_DEATH]: 'РЕШАЮЩЕЕ ОЧКО',
@@ -222,6 +267,7 @@ export class GameUI {
       elements.resultScore.textContent = `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}. Лучшая серия: ${snapshot.bestRally}`;
     }
     document.documentElement.dataset.gameState = snapshot.state;
+    document.documentElement.dataset.powerUps = String(snapshot.powerUps.enabled);
   }
 
   setVersion(version) {

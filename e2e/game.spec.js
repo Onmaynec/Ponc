@@ -9,7 +9,7 @@ test('loads, starts, pauses, resumes and resets a match', async ({ page }) => {
 
   await page.goto('/');
   await expect(page).toHaveTitle(/Ponc 1\.4\.0/);
-  await expect(page.locator('html')).toHaveAttribute('data-app-version', '1.4.0');
+  await expect(page.locator('html')).toHaveAttribute('data-app-version', '1.5.0');
   await expect(page.getByRole('button', { name: 'НАЧАТЬ МАТЧ' })).toBeVisible();
 
   await page.getByRole('button', { name: 'НАЧАТЬ МАТЧ' }).click();

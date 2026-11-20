@@ -8,7 +8,7 @@
       name="description"
       content="Ponc — динамичный браузерный Pong с режимом на двоих, сложностью ИИ и статистикой матчей."
     />
-    <title>Ponc 1.4.0 — Game Modes Update</title>
+    <title>Ponc 1.5.0 — Power-Up Arena</title>
     <link rel="stylesheet" href="/src/ui/style.css" />
   </head>
   <body>
@@ -20,7 +20,7 @@
           <h1>PONC<span class="brand-mark">.</span></h1>
           <p class="subtitle">Быстрее. Точнее. До последнего очка.</p>
         </div>
-        <p class="header-edition">ARCADE EDITION <span data-app-version>1.4.0</span></p>
+        <p class="header-edition">ARCADE EDITION <span data-app-version>1.5.0</span></p>
       </header>
       <section class="game-area" aria-label="Игровая область Ponc">
         <div class="game-stage" id="gameStage">
@@ -57,6 +57,12 @@
                     <option value="classic">Классика</option>
                     <option value="sudden">Решающее очко</option>
                     <option value="timed">На время — 90 секунд</option>
+                  </select></label
+                >
+                <label class="setting-field" for="powerUpsSelect"
+                  >Бонусы на арене<select id="powerUpsSelect">
+                    <option value="off" selected>Классическая арена</option>
+                    <option value="on">Силовые капсулы</option>
                   </select></label
                 >
                 <label
@@ -118,12 +124,15 @@
             </div>
           </div>
           <div class="countdown" id="countdown" hidden aria-live="assertive">2</div>
+          <div class="powerup-alert" id="powerUpAlert" role="status" aria-live="polite" hidden></div>
           <div class="state-badge" id="stateBadge" aria-live="polite">Меню</div>
         </div>
         <div class="game-toolbar">
           <div class="match-metrics">
             <span id="matchRuleLabel">КЛАССИКА</span>
             <span id="matchClock" hidden>ОСТАЛОСЬ 90 С</span>
+            <span id="powerUpInfo" hidden>Собирайте капсулы мячом</span>
+            <span id="powerUpCounter" class="powerup-counter" aria-label="Всего усилений">0</span>
             <span>РОЗЫГРЫШ <b id="rallyValue">0</b></span
             ><span>ЛУЧШАЯ СЕРИЯ <b id="bestRallyValue">0</b></span>
           </div>
@@ -141,6 +150,11 @@
           </div>
         </div>
       </section>
+      <div class="powerup-legend" aria-label="Виды усилений">
+        <span><b class="powerup-expand">+</b> XL РАКЕТКА · 7 СЕК</span>
+        <span><b class="powerup-turbo">»</b> ТУРБО · УСКОРЕНИЕ</span>
+        <span><b class="powerup-shield">◆</b> ЩИТ · 9 СЕК</span>
+      </div>
       <section class="scoreboard" aria-label="Счёт матча">
         <div class="score-player">
           <span class="score-label">ИГРОК 1</span
@@ -167,7 +181,7 @@
         <div class="panel">
           <p class="panel-heading">УПРАВЛЕНИЕ <span>HOW TO PLAY</span></p>
           <div class="controls">
-            <div><kbd>МЫШЬ</kbd><span>Одиночная игра</span></div>
+            <div><kbd>МЫШЬ</kbd><span>Одиночная игра; на телефоне — касание и движение</span></div>
             <div><kbd>W</kbd> <kbd>S</kbd><span>Игрок 1 (вдвоём)</span></div>
             <div><kbd>↑</kbd> <kbd>↓</kbd><span>Игрок 2 / соло</span></div>
             <div><kbd>ESC</kbd><span>Пауза</span></div>
@@ -200,7 +214,7 @@
       </section>
       <footer class="footer">
         <span>PONC · MADE FOR THE RALLY</span
-        ><span>BUILD <span data-app-version>1.4.0</span></span>
+        ><span>BUILD <span data-app-version>1.5.0</span></span>
       </footer>
     </main>
     <script type="module" src="/src/main.js"></script>

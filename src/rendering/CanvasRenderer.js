@@ -76,7 +76,56 @@ export class CanvasRenderer {
     }[this.palette];
     this.drawPaddle(snapshot.paddles.player, colors[0]);
     this.drawPaddle(snapshot.paddles.ai, colors[1]);
+    if (snapshot.powerUps?.enabled) {
+      this.drawPowerUp(snapshot.powerUps.pickup);
+      this.drawShield(snapshot.powerUps.shield, snapshot.field);
+    }
     this.drawBall(snapshot.ball);
+  }
+
+  drawPowerUp(pickup) {
+    if (!pickup) return;
+    const ctx = this.context;
+    const colors = { expand: '#61ead4', turbo: '#ffd166', shield: '#9f89ff' };
+    const glyphs = { expand: '+', turbo: '»', shield: '◆' };
+    const color = colors[pickup.type] || '#ffffff';
+    ctx.save();
+    ctx.shadowBlur = 24;
+    ctx.shadowColor = color;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(pickup.x, pickup.y, pickup.radius + 4, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#0c1725';
+    ctx.beginPath();
+    ctx.arc(pickup.x, pickup.y, pickup.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = color;
+    ctx.font = 'bold 19px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(glyphs[pickup.type] || '?', pickup.x, pickup.y + 1);
+    ctx.restore();
+  }
+
+  drawShield(shields, field) {
+    const ctx = this.context;
+    for (const [side, seconds] of Object.entries(shields)) {
+      if (seconds <= 0) continue;
+      const x = side === 'player' ? 7 : field.width - 7;
+      ctx.save();
+      ctx.shadowColor = '#9b8cff';
+      ctx.shadowBlur = 25;
+      ctx.strokeStyle = '#a89aff';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(x, 16);
+      ctx.lineTo(x, field.height - 16);
+      ctx.stroke();
+      ctx.restore();
+    }
   }
 
   drawPaddle(paddle, color) {

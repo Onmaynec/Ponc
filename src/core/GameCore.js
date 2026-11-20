@@ -3,6 +3,7 @@ import { createBall } from '../entities/createBall.js';
 import { createPaddle } from '../entities/createPaddle.js';
 import { AISystem } from '../systems/AISystem.js';
 import { PhysicsSystem } from '../systems/PhysicsSystem.js';
+import { PowerUpSystem } from '../systems/PowerUpSystem.js';
 import { EventBus } from './EventBus.js';
 import { GAME_EVENTS, GAME_STATES, INPUT_MODES } from './constants.js';
 import { GameStateMachine } from './GameStateMachine.js';
@@ -22,6 +23,8 @@ export class GameCore {
     this.stateMachine = new GameStateMachine(this.events);
     this.physics = new PhysicsSystem(config);
     this.ai = new AISystem(config);
+    this.powerUps = new PowerUpSystem(config, random);
+    this.lastHitter = null;
     this.settings = { ...DEFAULT_SETTINGS };
     this.pausedFromState = GAME_STATES.PLAYING;
     this.countdownRemainingSeconds = config.match.countdownSeconds;
@@ -128,8 +131,23 @@ export class GameCore {
       deltaSeconds,
     );
     if (Math.sign(ballBefore.vx) !== Math.sign(this.model.ball.vx)) {
+      this.lastHitter = this.model.ball.vx > 0 ? 'player' : 'ai';
       this.rallyHits += 1;
       this.bestRally = Math.max(this.bestRally, this.rallyHits);
+    }
+    if (this.settings.powerUps) {
+      const collected = this.powerUps.step(
+        deltaSeconds, this.model, this.lastHitter,
+      );
+      if (collected)
+        this.events.emit(GAME_EVENTS.POWER_UP_COLLECTED, collected);
+      if (goal) {
+        const shield = this.powerUps.blockGoal(goal, this.model);
+        if (shield) {
+          this.events.emit(GAME_EVENTS.POWER_UP_SHIELD, shield);
+          return;
+        }
+      }
     }
     if (goal) this.awardPoint(goal);
   }
@@ -137,6 +155,8 @@ export class GameCore {
   beginServe() {
     this.resetBall();
     this.rallyHits = 0;
+    this.lastHitter = null;
+    this.powerUps.resetRound(this.model);
     this.countdownRemainingSeconds = this.config.match.countdownSeconds;
     this.stateMachine.transition(GAME_STATES.COUNTDOWN);
     this.events.emit(GAME_EVENTS.SERVE_STARTED, this.getSnapshot());
@@ -184,6 +204,8 @@ export class GameCore {
     this.bestRally = 0;
     this.remainingSeconds = TIME_ATTACK_SECONDS;
     this.overtime = false;
+    this.lastHitter = null;
+    this.powerUps.resetMatch(this.model);
   }
   resetPositions() {
     const centerY = this.config.field.height / 2 - this.config.paddle.height / 2;
@@ -218,6 +240,7 @@ export class GameCore {
       bestRally: this.bestRally,
       remainingSeconds: this.remainingSeconds,
       overtime: this.overtime,
+      powerUps: this.powerUps.getSnapshot(this.settings.powerUps),
       field: { ...this.config.field },
       ball: { ...this.model.ball },
       paddles: {

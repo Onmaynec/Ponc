@@ -21,7 +21,7 @@ function fakeStorage() {
 test('normalizes match choices and rejects arbitrary score limits', () => {
   assert.deepEqual(
     normalizeSettings({ mode: 'local', difficulty: 'hard', winningScore: '7' }),
-    { mode: 'local', difficulty: 'hard', winningScore: 7, ruleset: 'classic' },
+    { mode: 'local', difficulty: 'hard', winningScore: 7, ruleset: 'classic', powerUps: false },
   );
   assert.equal(normalizeSettings({ winningScore: -20 }).winningScore, 11);
 });

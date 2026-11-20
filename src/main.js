@@ -8,7 +8,7 @@ import { InputSystem } from './systems/InputSystem.js';
 import { GameUI } from './ui/GameUI.js';
 import { SoundSystem } from './systems/SoundSystem.js';
 
-const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.4.0';
+const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.5.0';
 
 function bootstrap() {
   const canvas = document.getElementById('gameCanvas');
@@ -68,6 +68,14 @@ function bootstrap() {
   };
   ui.bind(actions);
   core.events.on(GAME_EVENTS.SERVE_ACTIVE, () => sound.play('serve'));
+  core.events.on(GAME_EVENTS.POWER_UP_COLLECTED, (payload) => {
+    sound.play('power');
+    ui.showPowerUp(payload);
+  });
+  core.events.on(GAME_EVENTS.POWER_UP_SHIELD, (payload) => {
+    sound.play('shield');
+    ui.showPowerUp({ ...payload, shield: true });
+  });
   core.events.on(GAME_EVENTS.GOAL, ({ side }) =>
     sound.play(side === 'player' ? 'goal' : 'lose'),
   );

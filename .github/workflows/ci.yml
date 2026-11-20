@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, feature/interactive-game-1.2, feature/arcade-progression-1.3]
+    branches: [main, feature/interactive-game-1.2, feature/arcade-progression-1.3, feature/game-modes-1.4]
 
 permissions:
   contents: read

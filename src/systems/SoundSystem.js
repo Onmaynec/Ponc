@@ -24,6 +24,8 @@ export class SoundSystem {
       lose: [185, 0.22, 'sawtooth'],
       win: [880, 0.28, 'triangle'],
       serve: [360, 0.075, 'sine'],
+      power: [1100, 0.21, 'triangle'],
+      shield: [220, 0.24, 'sawtooth'],
     };
     const [frequency, duration, waveform] = presets[type] || presets.paddle;
     try {

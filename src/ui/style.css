@@ -547,3 +547,13 @@ kbd {
 #matchRuleLabel {
   color: #57e6d2;
 }
+
+/* Power-up Arena HUD and tactical effects */
+.powerup-legend{display:flex;flex-wrap:wrap;gap:10px 24px;margin:0 0 17px;color:#8da8b8;font-size:10px;font-weight:800;letter-spacing:.06em}
+.powerup-legend b{font-size:17px;margin-right:4px}
+.powerup-expand{color:#61ead4}.powerup-turbo{color:#ffd166}.powerup-shield{color:#a89aff}
+#powerUpInfo{color:#a89aff;font-weight:900}
+.powerup-counter{color:#c5b8ff;font-weight:900}
+html[data-power-ups="false"] .powerup-legend{opacity:.35}
+.powerup-alert{position:absolute;z-index:3;left:50%;top:17%;transform:translateX(-50%);max-width:90%;border:1px solid #7666c0;border-radius:12px;background:#171930e8;padding:11px 17px;color:#eee5ff;font-size:clamp(11px,2vw,16px);font-weight:900;letter-spacing:.04em;box-shadow:0 10px 35px #02071299;pointer-events:none;text-align:center}
+@media (max-width:480px){.powerup-legend{font-size:9px;gap:5px 12px}.match-metrics{gap:7px}}

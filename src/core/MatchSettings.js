@@ -16,10 +16,12 @@ export const DEFAULT_SETTINGS = Object.freeze({
   difficulty: DIFFICULTIES.NORMAL,
   winningScore: 11,
   ruleset: RULESETS.CLASSIC,
+  powerUps: false,
 });
 
 export function normalizeSettings(input = {}) {
   return {
+    powerUps: input.powerUps === true || input.powerUps === 'on',
     ruleset: Object.values(RULESETS).includes(input.ruleset)
       ? input.ruleset
       : DEFAULT_SETTINGS.ruleset,
