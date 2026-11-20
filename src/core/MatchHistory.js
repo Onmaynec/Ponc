@@ -31,6 +31,7 @@ export function saveMatchResult(storage, snapshot, now = new Date()) {
     aiScore: snapshot.score.ai,
     mode: snapshot.settings.mode,
     difficulty: snapshot.settings.difficulty,
+    ruleset: snapshot.settings.ruleset,
     date: now.toISOString(),
   };
   const results = [entry, ...readMatchHistory(storage)].slice(0, MAX_MATCHES);

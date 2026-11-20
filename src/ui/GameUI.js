@@ -1,6 +1,6 @@
 import { ACHIEVEMENTS, unlockedAchievements } from '../core/Achievements.js';
 import { GAME_STATES } from '../core/constants.js';
-import { normalizeSettings, GAME_MODES } from '../core/MatchSettings.js';
+import { normalizeSettings, GAME_MODES, RULESETS } from '../core/MatchSettings.js';
 import { summarizeHistory } from '../core/MatchHistory.js';
 
 const STATE_LABELS = Object.freeze({
@@ -39,6 +39,10 @@ export class GameUI {
       'gameOverMenuButton',
       'fatalError',
       'modeSelect',
+      'rulesetSelect',
+      'winningScoreField',
+      'matchClock',
+      'matchRuleLabel',
       'difficultySelect',
       'winningScoreSelect',
       'difficultyField',
@@ -84,6 +88,10 @@ export class GameUI {
     this.cleanup.push(() =>
       this.elements.modeSelect.removeEventListener('change', modeChanged),
     );
+    this.elements.rulesetSelect.addEventListener('change', modeChanged);
+    this.cleanup.push(() =>
+      this.elements.rulesetSelect.removeEventListener('change', modeChanged),
+    );
     this.updateModeHint();
   }
 
@@ -122,6 +130,7 @@ export class GameUI {
   getSettings() {
     return normalizeSettings({
       mode: this.elements.modeSelect.value,
+      ruleset: this.elements.rulesetSelect.value,
       difficulty: this.elements.difficultySelect.value,
       winningScore: Number(this.elements.winningScoreSelect.value),
     });
@@ -130,9 +139,17 @@ export class GameUI {
   updateModeHint() {
     const local = this.elements.modeSelect.value === GAME_MODES.LOCAL;
     this.elements.difficultyField.hidden = local;
-    this.elements.modeHint.textContent = local
-      ? 'Игрок 1: W / S · Игрок 2: ↑ / ↓ · игра вдвоём за одной клавиатурой.'
+    const ruleset = this.elements.rulesetSelect.value;
+    this.elements.winningScoreField.hidden = ruleset !== RULESETS.CLASSIC;
+    const controls = local
+      ? 'Игрок 1: W / S · Игрок 2: ↑ / ↓.'
       : 'Вы управляете левой ракеткой мышью или стрелками. Справа — компьютер.';
+    const rules = {
+      [RULESETS.CLASSIC]: 'Побеждает первый, кто наберёт выбранное количество очков.',
+      [RULESETS.SUDDEN_DEATH]: 'Первое очко решает весь матч.',
+      [RULESETS.TIME_ATTACK]: '90 секунд активной игры. При ничьей — решающее очко.',
+    };
+    this.elements.modeHint.textContent = `${controls} ${rules[ruleset]}`;
   }
 
   setHistory(history) {
@@ -164,6 +181,15 @@ export class GameUI {
       snapshot.settings.mode === GAME_MODES.LOCAL ? 'Игрок 2' : 'Компьютер';
     elements.rallyValue.textContent = String(snapshot.rallyHits);
     elements.bestRallyValue.textContent = String(snapshot.bestRally);
+    elements.matchRuleLabel.textContent = {
+      [RULESETS.CLASSIC]: 'КЛАССИКА',
+      [RULESETS.SUDDEN_DEATH]: 'РЕШАЮЩЕЕ ОЧКО',
+      [RULESETS.TIME_ATTACK]: 'НА ВРЕМЯ',
+    }[snapshot.settings.ruleset];
+    elements.matchClock.hidden = snapshot.settings.ruleset !== RULESETS.TIME_ATTACK;
+    elements.matchClock.textContent = snapshot.overtime
+      ? 'ОВЕРТАЙМ'
+      : `ОСТАЛОСЬ ${Math.ceil(snapshot.remainingSeconds)} С`;
     elements.menuOverlay.hidden = snapshot.state !== GAME_STATES.MENU;
     elements.pauseOverlay.hidden = snapshot.state !== GAME_STATES.PAUSED;
     elements.gameOverOverlay.hidden = snapshot.state !== GAME_STATES.GAME_OVER;

@@ -8,7 +8,7 @@ import { InputSystem } from './systems/InputSystem.js';
 import { GameUI } from './ui/GameUI.js';
 import { SoundSystem } from './systems/SoundSystem.js';
 
-const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.3.0';
+const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.4.0';
 
 function bootstrap() {
   const canvas = document.getElementById('gameCanvas');
