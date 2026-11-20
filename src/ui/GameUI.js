@@ -152,7 +152,7 @@ export class GameUI {
     const ruleset = this.elements.rulesetSelect.value;
     this.elements.winningScoreField.hidden = ruleset !== RULESETS.CLASSIC;
     const controls = local
-      ? 'Игрок 1: W / S · Игрок 2: ↑ / ↓.'
+      ? 'Игрок 1: W / S · Игрок 2: ↑ / ↓. На телефоне — два касания по сторонам поля.'
       : 'Вы управляете левой ракеткой мышью или стрелками. Справа — компьютер.';
     const rules = {
       [RULESETS.CLASSIC]: 'Побеждает первый, кто наберёт выбранное количество очков.',

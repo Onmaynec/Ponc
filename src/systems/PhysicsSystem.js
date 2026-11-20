@@ -26,6 +26,10 @@ export class PhysicsSystem {
   }
 
   updateAI(paddle, command, deltaSeconds) {
+    if (command.mode === INPUT_MODES.POINTER && Number.isFinite(command.targetY)) {
+      paddle.y = clamp(command.targetY - paddle.height / 2, 0, this.config.field.height - paddle.height);
+      return;
+    }
     const speedFactor = Number.isFinite(command.speedFactor)
       ? clamp(command.speedFactor, 0, 2)
       : 1;

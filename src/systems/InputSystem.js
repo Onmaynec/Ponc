@@ -9,10 +9,13 @@ export class InputSystem {
     this.pointerY = fieldHeight / 2;
     this.keys = { ArrowUp: false, ArrowDown: false, KeyW: false, KeyS: false };
     this.attached = false;
+    this.touchTargets = { player: null, ai: null };
+    this.pointerSides = new Map();
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handlePointerMove = this.handlePointerMove.bind(this);
     this.handlePointerDown = this.handlePointerDown.bind(this);
+    this.handlePointerUp = this.handlePointerUp.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
     this.handleVisibilityChange = this.handleVisibilityChange.bind(this);
   }
@@ -25,6 +28,8 @@ export class InputSystem {
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
     this.canvas.addEventListener('pointermove', this.handlePointerMove);
     this.canvas.addEventListener('pointerdown', this.handlePointerDown);
+    this.canvas.addEventListener('pointerup', this.handlePointerUp);
+    this.canvas.addEventListener('pointercancel', this.handlePointerUp);
     this.attached = true;
   }
 
@@ -36,16 +41,28 @@ export class InputSystem {
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     this.canvas.removeEventListener('pointermove', this.handlePointerMove);
     this.canvas.removeEventListener('pointerdown', this.handlePointerDown);
+    this.canvas.removeEventListener('pointerup', this.handlePointerUp);
+    this.canvas.removeEventListener('pointercancel', this.handlePointerUp);
     this.attached = false;
   }
 
   reset() {
     for (const key of Object.keys(this.keys)) this.keys[key] = false;
     this.pointerY = this.fieldHeight / 2;
+    this.touchTargets.player = null;
+    this.touchTargets.ai = null;
+    this.pointerSides.clear();
   }
 
   getCommand(mode = 'solo') {
     const local = mode === 'local';
+    if (local && this.touchTargets.player !== null) {
+      return {
+        mode: INPUT_MODES.POINTER,
+        direction: 0,
+        targetY: this.touchTargets.player,
+      };
+    }
     return {
       mode: local ? INPUT_MODES.KEYBOARD : this.mode,
       direction: local
@@ -56,17 +73,29 @@ export class InputSystem {
   }
 
   getSecondPlayerCommand() {
+    if (this.touchTargets.ai !== null) {
+      return {
+        mode: INPUT_MODES.POINTER,
+        direction: 0,
+        targetY: this.touchTargets.ai,
+        speedFactor: 1,
+      };
+    }
     return {
       direction: Number(this.keys.ArrowDown) - Number(this.keys.ArrowUp),
       speedFactor: 1,
     };
   }
 
-  setPointerFromClientY(clientY) {
+  clientYToField(clientY) {
     const rect = this.canvas.getBoundingClientRect();
-    if (rect.height <= 0) return;
+    if (rect.height <= 0) return this.fieldHeight / 2;
     const logicalY = (clientY - rect.top) * (this.fieldHeight / rect.height);
-    this.pointerY = Math.max(0, Math.min(this.fieldHeight, logicalY));
+    return Math.max(0, Math.min(this.fieldHeight, logicalY));
+  }
+
+  setPointerFromClientY(clientY) {
+    this.pointerY = this.clientYToField(clientY);
     this.mode = INPUT_MODES.POINTER;
   }
 
@@ -107,10 +136,30 @@ export class InputSystem {
 
   handlePointerMove(event) {
     this.setPointerFromClientY(event.clientY);
+    if (event.pointerType === 'touch' && this.pointerSides.has(event.pointerId)) {
+      this.touchTargets[this.pointerSides.get(event.pointerId)] =
+        this.clientYToField(event.clientY);
+    }
   }
+
   handlePointerDown(event) {
     this.setPointerFromClientY(event.clientY);
+    if (event.pointerType === 'touch') {
+      const rect = this.canvas.getBoundingClientRect();
+      const side = event.clientX < rect.left + rect.width / 2 ? 'player' : 'ai';
+      this.pointerSides.set(event.pointerId, side);
+      this.touchTargets[side] = this.clientYToField(event.clientY);
+      try { this.canvas.setPointerCapture(event.pointerId); } catch { /* optional */ }
+    }
     this.canvas.focus({ preventScroll: true });
+  }
+
+  handlePointerUp(event) {
+    if (!this.pointerSides.has(event.pointerId)) return;
+    const side = this.pointerSides.get(event.pointerId);
+    this.pointerSides.delete(event.pointerId);
+    if (![...this.pointerSides.values()].includes(side))
+      this.touchTargets[side] = null;
   }
   handleBlur() {
     this.reset();

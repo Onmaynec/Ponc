@@ -144,6 +144,7 @@ export class GameCore {
       if (goal) {
         const shield = this.powerUps.blockGoal(goal, this.model);
         if (shield) {
+          this.lastHitter = shield.side;
           this.events.emit(GAME_EVENTS.POWER_UP_SHIELD, shield);
           return;
         }
