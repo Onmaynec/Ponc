@@ -1,3 +1,4 @@
+import { ACHIEVEMENTS, unlockedAchievements } from '../core/Achievements.js';
 import { GAME_STATES } from '../core/constants.js';
 import { normalizeSettings, GAME_MODES } from '../core/MatchSettings.js';
 import { summarizeHistory } from '../core/MatchHistory.js';
@@ -48,6 +49,10 @@ export class GameUI {
       'careerWins',
       'careerRate',
       'modeHint',
+      'soundToggle',
+      'paletteSelect',
+      'achievementsList',
+      'achievementCount',
     ];
     const elements = Object.fromEntries(
       ids.map((id) => [id, this.root.getElementById(id)]),
@@ -82,6 +87,25 @@ export class GameUI {
     this.updateModeHint();
   }
 
+  bindPreferences(callbacks, storage) {
+    const soundToggle = this.elements.soundToggle;
+    const paletteSelect = this.elements.paletteSelect;
+    let saved = {};
+    try { saved = JSON.parse(storage?.getItem('ponc:preferences:v1') || '{}') || {}; } catch { saved = {}; }
+    soundToggle.checked = saved.sound !== false;
+    paletteSelect.value = ['neon', 'retro', 'mono'].includes(saved.palette) ? saved.palette : 'neon';
+    const apply = () => {
+      callbacks.sound(soundToggle.checked);
+      callbacks.palette(paletteSelect.value);
+      try { storage?.setItem('ponc:preferences:v1', JSON.stringify({ sound: soundToggle.checked, palette: paletteSelect.value })); } catch { /* optional */ }
+    };
+    soundToggle.addEventListener('change', apply);
+    paletteSelect.addEventListener('change', apply);
+    this.cleanup.push(() => soundToggle.removeEventListener('change', apply));
+    this.cleanup.push(() => paletteSelect.removeEventListener('change', apply));
+    apply();
+  }
+
   getSettings() {
     return normalizeSettings({
       mode: this.elements.modeSelect.value,
@@ -103,6 +127,14 @@ export class GameUI {
     this.elements.careerGames.textContent = String(stats.games);
     this.elements.careerWins.textContent = String(stats.wins);
     this.elements.careerRate.textContent = `${stats.winRate}%`;
+    const unlocked = unlockedAchievements(history);
+    this.elements.achievementCount.textContent = `${unlocked.filter((item) => item.unlocked).length}/${ACHIEVEMENTS.length}`;
+    this.elements.achievementsList.replaceChildren(...unlocked.map((item) => {
+      const li = this.root.createElement('li');
+      li.className = item.unlocked ? 'achievement earned' : 'achievement';
+      li.textContent = `${item.unlocked ? '✓' : '○'} ${item.title} — ${item.description}`;
+      return li;
+    }));
   }
 
   destroy() {
