@@ -6,8 +6,8 @@ export const POWERUP_TYPES = Object.freeze({
 });
 
 const TYPES = Object.values(POWERUP_TYPES);
-const START_DELAY = 5;
-const NEXT_DELAY = 7;
+const START_DELAY = 3;
+const NEXT_DELAY = 5;
 const PICKUP_LIFETIME = 8;
 const PICKUP_RADIUS = 15;
 const EXPAND_SECONDS = 7;

@@ -97,7 +97,9 @@ test('match core does not spawn powerups when disabled or paused', () => {
   core.step(8);
   assert.equal(core.getSnapshot().powerUps.pickup, null);
   core.resume();
-  core.step(5);
+  core.model.ball.vx = 0;
+  core.model.ball.vy = 0;
+  core.step(3);
   assert.ok(core.getSnapshot().powerUps.pickup);
 });
 

@@ -210,6 +210,7 @@ export class GameUI {
     elements.rallyValue.textContent = String(snapshot.rallyHits);
     elements.bestRallyValue.textContent = String(snapshot.bestRally);
     elements.powerUpInfo.hidden = !snapshot.powerUps.enabled;
+    elements.powerUpCounter.hidden = !snapshot.powerUps.enabled;
     if (snapshot.powerUps.enabled) {
       const buffs = [];
       for (const side of ['player', 'ai']) {
