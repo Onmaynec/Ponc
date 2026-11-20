@@ -26,10 +26,13 @@ function bootstrap() {
     /* storage blocked */
   }
   ui.setHistory(readMatchHistory(storage));
-  ui.bindPreferences({
-    sound: (enabled) => sound.setEnabled(enabled),
-    palette: (palette) => renderer.setPalette(palette),
-  }, storage);
+  ui.bindPreferences(
+    {
+      sound: (enabled) => sound.setEnabled(enabled),
+      palette: (palette) => renderer.setPalette(palette),
+    },
+    storage,
+  );
   const input = new InputSystem({
     canvas,
     fieldHeight: GAME_CONFIG.field.height,
@@ -65,7 +68,9 @@ function bootstrap() {
   };
   ui.bind(actions);
   core.events.on(GAME_EVENTS.SERVE_ACTIVE, () => sound.play('serve'));
-  core.events.on(GAME_EVENTS.GOAL, ({ side }) => sound.play(side === 'player' ? 'goal' : 'lose'));
+  core.events.on(GAME_EVENTS.GOAL, ({ side }) =>
+    sound.play(side === 'player' ? 'goal' : 'lose'),
+  );
   core.events.on(GAME_EVENTS.GAME_OVER, (snapshot) => {
     sound.play(snapshot.winner === 'player' ? 'win' : 'lose');
     ui.setHistory(saveMatchResult(storage, snapshot));

@@ -11,7 +11,9 @@ export class SoundSystem {
     try {
       if (!this.context) this.context = new Context();
       if (this.context.state === 'suspended') void this.context.resume().catch(() => {});
-    } catch { this.context = null; }
+    } catch {
+      this.context = null;
+    }
   }
 
   play(type) {
@@ -36,7 +38,9 @@ export class SoundSystem {
       gain.connect(this.context.destination);
       oscillator.start();
       oscillator.stop(this.context.currentTime + duration + 0.01);
-    } catch { /* Audio output is optional. */ }
+    } catch {
+      /* Audio output is optional. */
+    }
   }
 
   setEnabled(enabled) {

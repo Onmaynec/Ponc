@@ -91,13 +91,26 @@ export class GameUI {
     const soundToggle = this.elements.soundToggle;
     const paletteSelect = this.elements.paletteSelect;
     let saved = {};
-    try { saved = JSON.parse(storage?.getItem('ponc:preferences:v1') || '{}') || {}; } catch { saved = {}; }
+    try {
+      saved = JSON.parse(storage?.getItem('ponc:preferences:v1') || '{}') || {};
+    } catch {
+      saved = {};
+    }
     soundToggle.checked = saved.sound !== false;
-    paletteSelect.value = ['neon', 'retro', 'mono'].includes(saved.palette) ? saved.palette : 'neon';
+    paletteSelect.value = ['neon', 'retro', 'mono'].includes(saved.palette)
+      ? saved.palette
+      : 'neon';
     const apply = () => {
       callbacks.sound(soundToggle.checked);
       callbacks.palette(paletteSelect.value);
-      try { storage?.setItem('ponc:preferences:v1', JSON.stringify({ sound: soundToggle.checked, palette: paletteSelect.value })); } catch { /* optional */ }
+      try {
+        storage?.setItem(
+          'ponc:preferences:v1',
+          JSON.stringify({ sound: soundToggle.checked, palette: paletteSelect.value }),
+        );
+      } catch {
+        /* optional */
+      }
     };
     soundToggle.addEventListener('change', apply);
     paletteSelect.addEventListener('change', apply);
@@ -129,12 +142,14 @@ export class GameUI {
     this.elements.careerRate.textContent = `${stats.winRate}%`;
     const unlocked = unlockedAchievements(history);
     this.elements.achievementCount.textContent = `${unlocked.filter((item) => item.unlocked).length}/${ACHIEVEMENTS.length}`;
-    this.elements.achievementsList.replaceChildren(...unlocked.map((item) => {
-      const li = this.root.createElement('li');
-      li.className = item.unlocked ? 'achievement earned' : 'achievement';
-      li.textContent = `${item.unlocked ? '✓' : '○'} ${item.title} — ${item.description}`;
-      return li;
-    }));
+    this.elements.achievementsList.replaceChildren(
+      ...unlocked.map((item) => {
+        const li = this.root.createElement('li');
+        li.className = item.unlocked ? 'achievement earned' : 'achievement';
+        li.textContent = `${item.unlocked ? '✓' : '○'} ${item.title} — ${item.description}`;
+        return li;
+      }),
+    );
   }
 
   destroy() {
