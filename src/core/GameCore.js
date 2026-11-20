@@ -105,6 +105,7 @@ export class GameCore {
           return;
         }
         this.overtime = true;
+        return;
       }
     }
     const aiCommand =
