@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#070d1b" />
-    <meta name="description" content="Ponc — динамичный браузерный Pong с режимом на двоих, сложностью ИИ и статистикой матчей." />
+    <meta
+      name="description"
+      content="Ponc — динамичный браузерный Pong с режимом на двоих, сложностью ИИ и статистикой матчей."
+    />
     <title>Ponc 1.2.0 — Arcade Arena</title>
     <link rel="stylesheet" href="/src/ui/style.css" />
   </head>
@@ -12,34 +15,157 @@
     <main class="container">
       <div class="fatal-error" id="fatalError" role="alert" hidden></div>
       <header class="header">
-        <div><p class="eyebrow">АРКАДНАЯ АРЕНА / СЕЗОН 01</p><h1>PONC<span class="brand-mark">.</span></h1><p class="subtitle">Быстрее. Точнее. До последнего очка.</p></div>
+        <div>
+          <p class="eyebrow">АРКАДНАЯ АРЕНА / СЕЗОН 01</p>
+          <h1>PONC<span class="brand-mark">.</span></h1>
+          <p class="subtitle">Быстрее. Точнее. До последнего очка.</p>
+        </div>
         <p class="header-edition">ARCADE EDITION <span data-app-version>1.2.0</span></p>
       </header>
       <section class="game-area" aria-label="Игровая область Ponc">
         <div class="game-stage" id="gameStage">
-          <canvas id="gameCanvas" width="800" height="400" tabindex="0" aria-label="Поле Pong. Мышь/стрелки — одиночный режим; W/S и стрелки — игра на двоих."></canvas>
+          <canvas
+            id="gameCanvas"
+            width="800"
+            height="400"
+            tabindex="0"
+            aria-label="Поле Pong. Мышь/стрелки — одиночный режим; W/S и стрелки — игра на двоих."
+          ></canvas>
           <div class="game-overlay" id="menuOverlay">
             <div class="overlay-card">
-              <p class="overlay-kicker">НОВЫЙ МАТЧ</p><h2>Выбирай арену.</h2>
-              <p class="overlay-subtitle">Один против компьютера или вдвоём на одной клавиатуре.</p>
+              <p class="overlay-kicker">НОВЫЙ МАТЧ</p>
+              <h2>Выбирай арену.</h2>
+              <p class="overlay-subtitle">
+                Один против компьютера или вдвоём на одной клавиатуре.
+              </p>
               <div class="match-settings">
-                <label class="setting-field" for="modeSelect">Режим<select id="modeSelect"><option value="solo">Против компьютера</option><option value="local">Два игрока локально</option></select></label>
-                <label class="setting-field" id="difficultyField" for="difficultySelect">Сложность<select id="difficultySelect"><option value="easy">Новичок</option><option value="normal" selected>Стандарт</option><option value="hard">Эксперт</option></select></label>
-                <label class="setting-field" for="winningScoreSelect">Игра до<select id="winningScoreSelect"><option value="5">5 очков</option><option value="7">7 очков</option><option value="11" selected>11 очков</option><option value="15">15 очков</option></select></label>
+                <label class="setting-field" for="modeSelect"
+                  >Режим<select id="modeSelect">
+                    <option value="solo">Против компьютера</option>
+                    <option value="local">Два игрока локально</option>
+                  </select></label
+                >
+                <label class="setting-field" id="difficultyField" for="difficultySelect"
+                  >Сложность<select id="difficultySelect">
+                    <option value="easy">Новичок</option>
+                    <option value="normal" selected>Стандарт</option>
+                    <option value="hard">Эксперт</option>
+                  </select></label
+                >
+                <label class="setting-field" for="winningScoreSelect"
+                  >Игра до<select id="winningScoreSelect">
+                    <option value="5">5 очков</option>
+                    <option value="7">7 очков</option>
+                    <option value="11" selected>11 очков</option>
+                    <option value="15">15 очков</option>
+                  </select></label
+                >
               </div>
-              <p class="mode-hint" id="modeHint">Вы управляете левой ракеткой мышью или стрелками. Справа — компьютер.</p>
-              <button class="button button-primary" id="startButton" type="button">НАЧАТЬ МАТЧ</button>
+              <p class="mode-hint" id="modeHint">
+                Вы управляете левой ракеткой мышью или стрелками. Справа — компьютер.
+              </p>
+              <button class="button button-primary" id="startButton" type="button">
+                НАЧАТЬ МАТЧ
+              </button>
             </div>
           </div>
-          <div class="game-overlay" id="pauseOverlay" hidden><div class="overlay-card compact-card"><p class="overlay-kicker">ПЕРЕРЫВ</p><h2>Пауза</h2><p>Матч остановлен. Продолжай, когда будешь готов.</p><div class="overlay-actions"><button class="button button-primary" id="resumeButton" type="button">Продолжить</button><button class="button button-secondary" id="pauseRestartButton" type="button">Заново</button><button class="button button-ghost" id="pauseMenuButton" type="button">В меню</button></div></div></div>
-          <div class="game-overlay" id="gameOverOverlay" hidden><div class="overlay-card compact-card"><p class="overlay-kicker">ФИНАЛЬНЫЙ СВИСТОК</p><h2 id="resultTitle">Победа</h2><p id="resultScore">Финальный счёт: 0:0</p><div class="overlay-actions"><button class="button button-primary" id="replayButton" type="button">Ещё матч</button><button class="button button-ghost" id="gameOverMenuButton" type="button">В меню</button></div></div></div>
-          <div class="countdown" id="countdown" hidden aria-live="assertive">2</div><div class="state-badge" id="stateBadge" aria-live="polite">Меню</div>
+          <div class="game-overlay" id="pauseOverlay" hidden>
+            <div class="overlay-card compact-card">
+              <p class="overlay-kicker">ПЕРЕРЫВ</p>
+              <h2>Пауза</h2>
+              <p>Матч остановлен. Продолжай, когда будешь готов.</p>
+              <div class="overlay-actions">
+                <button class="button button-primary" id="resumeButton" type="button">
+                  Продолжить</button
+                ><button
+                  class="button button-secondary"
+                  id="pauseRestartButton"
+                  type="button"
+                >
+                  Заново</button
+                ><button class="button button-ghost" id="pauseMenuButton" type="button">
+                  В меню
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="game-overlay" id="gameOverOverlay" hidden>
+            <div class="overlay-card compact-card">
+              <p class="overlay-kicker">ФИНАЛЬНЫЙ СВИСТОК</p>
+              <h2 id="resultTitle">Победа</h2>
+              <p id="resultScore">Финальный счёт: 0:0</p>
+              <div class="overlay-actions">
+                <button class="button button-primary" id="replayButton" type="button">
+                  Ещё матч</button
+                ><button
+                  class="button button-ghost"
+                  id="gameOverMenuButton"
+                  type="button"
+                >
+                  В меню
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="countdown" id="countdown" hidden aria-live="assertive">2</div>
+          <div class="state-badge" id="stateBadge" aria-live="polite">Меню</div>
         </div>
-        <div class="game-toolbar"><div class="match-metrics"><span>РОЗЫГРЫШ <b id="rallyValue">0</b></span><span>ЛУЧШАЯ СЕРИЯ <b id="bestRallyValue">0</b></span></div><div class="toolbar-buttons"><button class="button button-secondary" id="pauseButton" type="button" disabled>Пауза</button><button class="button button-secondary" id="restartButton" type="button">Начать заново</button></div></div>
+        <div class="game-toolbar">
+          <div class="match-metrics">
+            <span>РОЗЫГРЫШ <b id="rallyValue">0</b></span
+            ><span>ЛУЧШАЯ СЕРИЯ <b id="bestRallyValue">0</b></span>
+          </div>
+          <div class="toolbar-buttons">
+            <button
+              class="button button-secondary"
+              id="pauseButton"
+              type="button"
+              disabled
+            >
+              Пауза</button
+            ><button class="button button-secondary" id="restartButton" type="button">
+              Начать заново
+            </button>
+          </div>
+        </div>
       </section>
-      <section class="scoreboard" aria-label="Счёт матча"><div class="score-player"><span class="score-label">ИГРОК 1</span><span class="score-value" id="playerScore">0</span></div><div class="score-center"><span>СЧЁТ</span><strong>VS</strong></div><div class="score-ai"><span class="score-label" id="aiLabel">Компьютер</span><span class="score-value" id="aiScore">0</span></div></section>
-      <section class="lower-grid"><div class="panel"><p class="panel-heading">ТВОЯ КАРЬЕРА <span>SOLO</span></p><div class="career-stats"><div><strong id="careerGames">0</strong><span>матчей</span></div><div><strong id="careerWins">0</strong><span>побед</span></div><div><strong id="careerRate">0%</strong><span>винрейт</span></div></div><p class="panel-footnote">Результаты одиночных матчей сохраняются в этом браузере.</p></div><div class="panel"><p class="panel-heading">УПРАВЛЕНИЕ <span>HOW TO PLAY</span></p><div class="controls"><div><kbd>МЫШЬ</kbd><span>Одиночная игра</span></div><div><kbd>W</kbd> <kbd>S</kbd><span>Игрок 1 (вдвоём)</span></div><div><kbd>↑</kbd> <kbd>↓</kbd><span>Игрок 2 / соло</span></div><div><kbd>ESC</kbd><span>Пауза</span></div></div></div></section>
-      <footer class="footer"><span>PONC · MADE FOR THE RALLY</span><span>BUILD <span data-app-version>1.2.0</span></span></footer>
+      <section class="scoreboard" aria-label="Счёт матча">
+        <div class="score-player">
+          <span class="score-label">ИГРОК 1</span
+          ><span class="score-value" id="playerScore">0</span>
+        </div>
+        <div class="score-center"><span>СЧЁТ</span><strong>VS</strong></div>
+        <div class="score-ai">
+          <span class="score-label" id="aiLabel">Компьютер</span
+          ><span class="score-value" id="aiScore">0</span>
+        </div>
+      </section>
+      <section class="lower-grid">
+        <div class="panel">
+          <p class="panel-heading">ТВОЯ КАРЬЕРА <span>SOLO</span></p>
+          <div class="career-stats">
+            <div><strong id="careerGames">0</strong><span>матчей</span></div>
+            <div><strong id="careerWins">0</strong><span>побед</span></div>
+            <div><strong id="careerRate">0%</strong><span>винрейт</span></div>
+          </div>
+          <p class="panel-footnote">
+            Результаты одиночных матчей сохраняются в этом браузере.
+          </p>
+        </div>
+        <div class="panel">
+          <p class="panel-heading">УПРАВЛЕНИЕ <span>HOW TO PLAY</span></p>
+          <div class="controls">
+            <div><kbd>МЫШЬ</kbd><span>Одиночная игра</span></div>
+            <div><kbd>W</kbd> <kbd>S</kbd><span>Игрок 1 (вдвоём)</span></div>
+            <div><kbd>↑</kbd> <kbd>↓</kbd><span>Игрок 2 / соло</span></div>
+            <div><kbd>ESC</kbd><span>Пауза</span></div>
+          </div>
+        </div>
+      </section>
+      <footer class="footer">
+        <span>PONC · MADE FOR THE RALLY</span
+        ><span>BUILD <span data-app-version>1.2.0</span></span>
+      </footer>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>

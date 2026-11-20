@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('selects local match settings and shows the second human player', async ({ page }) => {
+test('selects local match settings and shows the second human player', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.locator('#modeSelect').selectOption('local');
   await expect(page.locator('#difficultyField')).toBeHidden();

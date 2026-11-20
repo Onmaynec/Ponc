@@ -11,12 +11,17 @@ const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.2
 
 function bootstrap() {
   const canvas = document.getElementById('gameCanvas');
-  if (!(canvas instanceof HTMLCanvasElement)) throw new Error('Game canvas is unavailable.');
+  if (!(canvas instanceof HTMLCanvasElement))
+    throw new Error('Game canvas is unavailable.');
   const core = new GameCore();
   const renderer = new CanvasRenderer(canvas, GAME_CONFIG);
   const ui = new GameUI();
   let storage = null;
-  try { storage = window.localStorage; } catch { /* storage blocked */ }
+  try {
+    storage = window.localStorage;
+  } catch {
+    /* storage blocked */
+  }
   ui.setHistory(readMatchHistory(storage));
   const input = new InputSystem({
     canvas,
@@ -34,10 +39,20 @@ function bootstrap() {
       core.startMatch();
       canvas.focus({ preventScroll: true });
     },
-    restart: () => { input.reset(); core.restartMatch(); canvas.focus({ preventScroll: true }); },
+    restart: () => {
+      input.reset();
+      core.restartMatch();
+      canvas.focus({ preventScroll: true });
+    },
     togglePause: () => core.togglePause(),
-    resume: () => { core.resume(); canvas.focus({ preventScroll: true }); },
-    menu: () => { input.reset(); core.returnToMenu(); },
+    resume: () => {
+      core.resume();
+      canvas.focus({ preventScroll: true });
+    },
+    menu: () => {
+      input.reset();
+      core.returnToMenu();
+    },
   };
   ui.bind(actions);
   core.events.on(GAME_EVENTS.GAME_OVER, (snapshot) => {
@@ -47,7 +62,12 @@ function bootstrap() {
   ui.setVersion(APP_VERSION);
   const loop = new GameLoop({
     config: GAME_CONFIG,
-    update: (deltaSeconds) => core.step(deltaSeconds, input.getCommand(core.settings.mode), input.getSecondPlayerCommand()),
+    update: (deltaSeconds) =>
+      core.step(
+        deltaSeconds,
+        input.getCommand(core.settings.mode),
+        input.getSecondPlayerCommand(),
+      ),
     render: () => {
       const snapshot = core.getSnapshot();
       renderer.render(snapshot);
@@ -57,8 +77,13 @@ function bootstrap() {
   loop.start();
 }
 
-try { bootstrap(); }
-catch (error) {
-  try { new GameUI().showFatalError(error); }
-  catch { console.error('Ponc initialization failed before UI recovery:', error); document.body.textContent = 'Ponc не удалось запустить.'; }
+try {
+  bootstrap();
+} catch (error) {
+  try {
+    new GameUI().showFatalError(error);
+  } catch {
+    console.error('Ponc initialization failed before UI recovery:', error);
+    document.body.textContent = 'Ponc не удалось запустить.';
+  }
 }

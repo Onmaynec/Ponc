@@ -48,14 +48,18 @@ export class InputSystem {
     const local = mode === 'local';
     return {
       mode: local ? INPUT_MODES.KEYBOARD : this.mode,
-      direction: local ? Number(this.keys.KeyS) - Number(this.keys.KeyW) :
-        Number(this.keys.ArrowDown) - Number(this.keys.ArrowUp),
+      direction: local
+        ? Number(this.keys.KeyS) - Number(this.keys.KeyW)
+        : Number(this.keys.ArrowDown) - Number(this.keys.ArrowUp),
       targetY: this.pointerY,
     };
   }
 
   getSecondPlayerCommand() {
-    return { direction: Number(this.keys.ArrowDown) - Number(this.keys.ArrowUp), speedFactor: 1 };
+    return {
+      direction: Number(this.keys.ArrowDown) - Number(this.keys.ArrowUp),
+      speedFactor: 1,
+    };
   }
 
   setPointerFromClientY(clientY) {
@@ -68,7 +72,9 @@ export class InputSystem {
 
   gameHasFocus() {
     const activeElement = document.activeElement;
-    return activeElement === this.canvas || Boolean(activeElement?.closest?.('.game-area'));
+    return (
+      activeElement === this.canvas || Boolean(activeElement?.closest?.('.game-area'))
+    );
   }
 
   handleKeyDown(event) {
@@ -79,10 +85,18 @@ export class InputSystem {
       if (this.gameHasFocus()) event.preventDefault();
       return;
     }
-    if (event.key === 'Escape') { event.preventDefault(); this.callbacks.onTogglePause?.(); return; }
-    if (event.key.toLowerCase() === 'r' && !event.repeat &&
-      !['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target?.tagName)) {
-      event.preventDefault(); this.callbacks.onRestart?.();
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.callbacks.onTogglePause?.();
+      return;
+    }
+    if (
+      event.key.toLowerCase() === 'r' &&
+      !event.repeat &&
+      !['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target?.tagName)
+    ) {
+      event.preventDefault();
+      this.callbacks.onRestart?.();
     }
   }
 
@@ -91,11 +105,18 @@ export class InputSystem {
     if (Object.prototype.hasOwnProperty.call(this.keys, code)) this.keys[code] = false;
   }
 
-  handlePointerMove(event) { this.setPointerFromClientY(event.clientY); }
+  handlePointerMove(event) {
+    this.setPointerFromClientY(event.clientY);
+  }
   handlePointerDown(event) {
     this.setPointerFromClientY(event.clientY);
     this.canvas.focus({ preventScroll: true });
   }
-  handleBlur() { this.reset(); this.callbacks.onAutomaticPause?.(); }
-  handleVisibilityChange() { if (document.hidden) this.handleBlur(); }
+  handleBlur() {
+    this.reset();
+    this.callbacks.onAutomaticPause?.();
+  }
+  handleVisibilityChange() {
+    if (document.hidden) this.handleBlur();
+  }
 }

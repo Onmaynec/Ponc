@@ -28,7 +28,9 @@ test('loads, starts, pauses, resumes and resets a match', async ({ page }) => {
   expect(consoleErrors).toEqual([]);
 });
 
-test('renders at a 320 px mobile viewport without fatal initialization errors', async ({ page }) => {
+test('renders at a 320 px mobile viewport without fatal initialization errors', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto('/');
   await expect(page.locator('#fatalError')).toBeHidden();

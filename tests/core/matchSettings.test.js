@@ -3,17 +3,26 @@ import test from 'node:test';
 import { GameCore } from '../../src/core/GameCore.js';
 import { GAME_STATES } from '../../src/core/constants.js';
 import { normalizeSettings } from '../../src/core/MatchSettings.js';
-import { readMatchHistory, saveMatchResult, summarizeHistory } from '../../src/core/MatchHistory.js';
+import {
+  readMatchHistory,
+  saveMatchResult,
+  summarizeHistory,
+} from '../../src/core/MatchHistory.js';
 import { AISystem } from '../../src/systems/AISystem.js';
 
 function fakeStorage() {
   const values = new Map();
-  return { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+  return {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+  };
 }
 
 test('normalizes match choices and rejects arbitrary score limits', () => {
-  assert.deepEqual(normalizeSettings({ mode: 'local', difficulty: 'hard', winningScore: '7' }),
-    { mode: 'local', difficulty: 'hard', winningScore: 7 });
+  assert.deepEqual(
+    normalizeSettings({ mode: 'local', difficulty: 'hard', winningScore: '7' }),
+    { mode: 'local', difficulty: 'hard', winningScore: 7 },
+  );
   assert.equal(normalizeSettings({ winningScore: -20 }).winningScore, 11);
 });
 
@@ -38,11 +47,23 @@ test('local match uses human second paddle command and selected win limit', () =
 
 test('history records finished games and separates solo career stats', () => {
   const storage = fakeStorage();
-  const snapshot = { winner: 'player', score: { player: 5, ai: 3 }, settings: { mode: 'solo', difficulty: 'hard' } };
+  const snapshot = {
+    winner: 'player',
+    score: { player: 5, ai: 3 },
+    settings: { mode: 'solo', difficulty: 'hard' },
+  };
   saveMatchResult(storage, snapshot, new Date('2026-01-01T00:00:00Z'));
-  saveMatchResult(storage, { ...snapshot, settings: { mode: 'local', difficulty: 'hard' } });
+  saveMatchResult(storage, {
+    ...snapshot,
+    settings: { mode: 'local', difficulty: 'hard' },
+  });
   assert.equal(readMatchHistory(storage).length, 2);
-  assert.deepEqual(summarizeHistory(readMatchHistory(storage)), { games: 1, wins: 1, losses: 0, winRate: 100 });
+  assert.deepEqual(summarizeHistory(readMatchHistory(storage)), {
+    games: 1,
+    wins: 1,
+    losses: 0,
+    winRate: 100,
+  });
   assert.deepEqual(readMatchHistory({ getItem: () => '{invalid' }), []);
 });
 

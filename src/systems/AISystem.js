@@ -1,7 +1,9 @@
 import { difficultyProfile } from '../core/MatchSettings.js';
 
 export class AISystem {
-  constructor(config) { this.config = config; }
+  constructor(config) {
+    this.config = config;
+  }
 
   createCommand(snapshot) {
     const profile = difficultyProfile(snapshot.settings?.difficulty);
@@ -21,7 +23,10 @@ export class AISystem {
     }
     const distance = targetY - paddleCenter;
     return {
-      direction: Math.abs(distance) <= this.config.paddle.aiDeadZone * profile.deadZoneFactor ? 0 : Math.sign(distance),
+      direction:
+        Math.abs(distance) <= this.config.paddle.aiDeadZone * profile.deadZoneFactor
+          ? 0
+          : Math.sign(distance),
       speedFactor: profile.speedFactor,
     };
   }
