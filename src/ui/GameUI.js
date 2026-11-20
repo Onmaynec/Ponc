@@ -190,15 +190,15 @@ export class GameUI {
       ? `${playerName} отразил удар щитом!`
       : `${playerName}: ${names[type] ?? 'БОНУС'}!`;
     this.elements.powerUpAlert.hidden = false;
-    if (this.alertTimeout !== null) clearTimeout(this.alertTimeout);
-    this.alertTimeout = setTimeout(() => {
+    if (this.alertTimeout !== null) window.clearTimeout(this.alertTimeout);
+    this.alertTimeout = window.setTimeout(() => {
       this.elements.powerUpAlert.hidden = true;
       this.alertTimeout = null;
     }, 1800);
   }
 
   destroy() {
-    if (this.alertTimeout !== null) clearTimeout(this.alertTimeout);
+    if (this.alertTimeout !== null) window.clearTimeout(this.alertTimeout);
     for (const dispose of this.cleanup.splice(0)) dispose();
   }
 
