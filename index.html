@@ -8,7 +8,7 @@
       name="description"
       content="Ponc — динамичный браузерный Pong с режимом на двоих, сложностью ИИ и статистикой матчей."
     />
-    <title>Ponc 1.2.0 — Arcade Arena</title>
+    <title>Ponc 1.3.0 — Arcade Progression</title>
     <link rel="stylesheet" href="/src/ui/style.css" />
   </head>
   <body>
@@ -20,7 +20,7 @@
           <h1>PONC<span class="brand-mark">.</span></h1>
           <p class="subtitle">Быстрее. Точнее. До последнего очка.</p>
         </div>
-        <p class="header-edition">ARCADE EDITION <span data-app-version>1.2.0</span></p>
+        <p class="header-edition">ARCADE EDITION <span data-app-version>1.3.0</span></p>
       </header>
       <section class="game-area" aria-label="Игровая область Ponc">
         <div class="game-stage" id="gameStage">
@@ -162,9 +162,33 @@
           </div>
         </div>
       </section>
+      <section class="lower-grid extras-grid" aria-label="Прогресс и настройки">
+        <div class="panel">
+          <p class="panel-heading">ДОСТИЖЕНИЯ <span id="achievementCount">0/5</span></p>
+          <ul id="achievementsList" class="achievements-list"></ul>
+        </div>
+        <div class="panel">
+          <p class="panel-heading">ПЕРСОНАЛИЗАЦИЯ <span>НАСТРОЙКИ</span></p>
+          <label class="preference-row" for="soundToggle"
+            >Звуковые эффекты <input type="checkbox" id="soundToggle" checked
+          /></label>
+          <label class="preference-row" for="paletteSelect"
+            >Цветовая схема
+            <select id="paletteSelect">
+              <option value="neon">Неоновая арена</option>
+              <option value="retro">Ретро</option>
+              <option value="mono">Монохром</option>
+            </select>
+          </label>
+          <p class="panel-footnote">
+            Настройки и достижения сохраняются в этом браузере. Звук включается после
+            взаимодействия с игрой.
+          </p>
+        </div>
+      </section>
       <footer class="footer">
         <span>PONC · MADE FOR THE RALLY</span
-        ><span>BUILD <span data-app-version>1.2.0</span></span>
+        ><span>BUILD <span data-app-version>1.3.0</span></span>
       </footer>
     </main>
     <script type="module" src="/src/main.js"></script>

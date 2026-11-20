@@ -6,8 +6,9 @@ import { readMatchHistory, saveMatchResult } from './core/MatchHistory.js';
 import { CanvasRenderer } from './rendering/CanvasRenderer.js';
 import { InputSystem } from './systems/InputSystem.js';
 import { GameUI } from './ui/GameUI.js';
+import { SoundSystem } from './systems/SoundSystem.js';
 
-const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.2.0';
+const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.3.0';
 
 function bootstrap() {
   const canvas = document.getElementById('gameCanvas');
@@ -16,6 +17,8 @@ function bootstrap() {
   const core = new GameCore();
   const renderer = new CanvasRenderer(canvas, GAME_CONFIG);
   const ui = new GameUI();
+  const sound = new SoundSystem();
+  let previousRallyHits = 0;
   let storage = null;
   try {
     storage = window.localStorage;
@@ -23,6 +26,13 @@ function bootstrap() {
     /* storage blocked */
   }
   ui.setHistory(readMatchHistory(storage));
+  ui.bindPreferences(
+    {
+      sound: (enabled) => sound.setEnabled(enabled),
+      palette: (palette) => renderer.setPalette(palette),
+    },
+    storage,
+  );
   const input = new InputSystem({
     canvas,
     fieldHeight: GAME_CONFIG.field.height,
@@ -34,12 +44,14 @@ function bootstrap() {
   });
   const actions = {
     start: () => {
+      sound.unlock();
       core.configure(ui.getSettings());
       input.reset();
       core.startMatch();
       canvas.focus({ preventScroll: true });
     },
     restart: () => {
+      sound.unlock();
       input.reset();
       core.restartMatch();
       canvas.focus({ preventScroll: true });
@@ -55,7 +67,12 @@ function bootstrap() {
     },
   };
   ui.bind(actions);
+  core.events.on(GAME_EVENTS.SERVE_ACTIVE, () => sound.play('serve'));
+  core.events.on(GAME_EVENTS.GOAL, ({ side }) =>
+    sound.play(side === 'player' ? 'goal' : 'lose'),
+  );
   core.events.on(GAME_EVENTS.GAME_OVER, (snapshot) => {
+    sound.play(snapshot.winner === 'player' ? 'win' : 'lose');
     ui.setHistory(saveMatchResult(storage, snapshot));
   });
   input.attach();
@@ -70,6 +87,8 @@ function bootstrap() {
       ),
     render: () => {
       const snapshot = core.getSnapshot();
+      if (snapshot.rallyHits > previousRallyHits) sound.play('paddle');
+      previousRallyHits = snapshot.rallyHits;
       renderer.render(snapshot);
       ui.render(snapshot);
     },

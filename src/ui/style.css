@@ -496,3 +496,46 @@ kbd {
     transition: none;
   }
 }
+
+.extras-grid {
+  margin-top: 15px;
+}
+.achievements-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.achievement {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #7891a3;
+}
+.achievement.earned {
+  color: #55e9d4;
+  font-weight: 700;
+}
+.preference-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 15px 0;
+  font-size: 13px;
+  color: #d9e7f0;
+}
+.preference-row select {
+  min-width: 0;
+  max-width: 60%;
+  padding: 9px;
+  border: 1px solid #355166;
+  border-radius: 8px;
+  background: #152638;
+  color: #fff;
+}
+.preference-row input {
+  width: 19px;
+  height: 19px;
+  accent-color: #50e9d5;
+}

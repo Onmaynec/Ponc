@@ -6,6 +6,11 @@ export class CanvasRenderer {
     if (!this.context) throw new Error('Canvas 2D context is unavailable.');
     this.trail = [];
     this.lastBallX = null;
+    this.palette = 'neon';
+  }
+
+  setPalette(value) {
+    this.palette = ['neon', 'retro', 'mono'].includes(value) ? value : 'neon';
   }
 
   render(snapshot) {
@@ -64,8 +69,13 @@ export class CanvasRenderer {
       );
       ctx.fill();
     });
-    this.drawPaddle(snapshot.paddles.player, '#50f0d6');
-    this.drawPaddle(snapshot.paddles.ai, '#ff689c');
+    const colors = {
+      neon: ['#50f0d6', '#ff689c'],
+      retro: ['#ffd166', '#ef476f'],
+      mono: ['#ffffff', '#9baab8'],
+    }[this.palette];
+    this.drawPaddle(snapshot.paddles.player, colors[0]);
+    this.drawPaddle(snapshot.paddles.ai, colors[1]);
     this.drawBall(snapshot.ball);
   }
 
