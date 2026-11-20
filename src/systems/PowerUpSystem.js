@@ -100,10 +100,7 @@ export class PowerUpSystem {
     switch (type) {
       case POWERUP_TYPES.EXPAND:
         this.effects.expand[lastHitter] = EXPAND_SECONDS;
-        this.setPaddleHeight(
-          model.paddles[lastHitter],
-          this.config.paddle.height * 1.5,
-        );
+        this.setPaddleHeight(model.paddles[lastHitter], this.config.paddle.height * 1.5);
         break;
       case POWERUP_TYPES.TURBO: {
         const speed = Math.hypot(ball.vx, ball.vy);
@@ -130,15 +127,10 @@ export class PowerUpSystem {
     if (this.effects.shield[defender] <= 0) return null;
     this.effects.shield[defender] = 0;
     const ball = model.ball;
-    const speed = Math.max(
-      Math.abs(ball.vx),
-      this.config.ball.minimumHorizontalSpeed,
-    );
+    const speed = Math.max(Math.abs(ball.vx), this.config.ball.minimumHorizontalSpeed);
     ball.vx = defender === 'player' ? speed : -speed;
     ball.x =
-      defender === 'player'
-        ? ball.radius + 2
-        : this.config.field.width - ball.radius - 2;
+      defender === 'player' ? ball.radius + 2 : this.config.field.width - ball.radius - 2;
     ball.y = clamp(ball.y, ball.radius, this.config.field.height - ball.radius);
     return { side: defender };
   }

@@ -16,8 +16,18 @@ function createInput() {
 
 test('two simultaneous touch pointers control different local paddles', () => {
   const input = createInput();
-  input.handlePointerDown({ pointerId: 1, pointerType: 'touch', clientX: 80, clientY: 70 });
-  input.handlePointerDown({ pointerId: 2, pointerType: 'touch', clientX: 730, clientY: 330 });
+  input.handlePointerDown({
+    pointerId: 1,
+    pointerType: 'touch',
+    clientX: 80,
+    clientY: 70,
+  });
+  input.handlePointerDown({
+    pointerId: 2,
+    pointerType: 'touch',
+    clientX: 730,
+    clientY: 330,
+  });
   assert.deepEqual(input.getCommand('local'), {
     mode: INPUT_MODES.POINTER,
     direction: 0,
@@ -47,7 +57,12 @@ test('right paddle moves correctly for touch target', () => {
 
 test('reset clears both touch targets', () => {
   const input = createInput();
-  input.handlePointerDown({ pointerId: 4, pointerType: 'touch', clientX: 100, clientY: 80 });
+  input.handlePointerDown({
+    pointerId: 4,
+    pointerType: 'touch',
+    clientX: 100,
+    clientY: 80,
+  });
   input.reset();
   assert.equal(input.getCommand('local').mode, INPUT_MODES.KEYBOARD);
 });

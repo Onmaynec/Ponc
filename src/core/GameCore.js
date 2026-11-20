@@ -136,11 +136,8 @@ export class GameCore {
       this.bestRally = Math.max(this.bestRally, this.rallyHits);
     }
     if (this.settings.powerUps) {
-      const collected = this.powerUps.step(
-        deltaSeconds, this.model, this.lastHitter,
-      );
-      if (collected)
-        this.events.emit(GAME_EVENTS.POWER_UP_COLLECTED, collected);
+      const collected = this.powerUps.step(deltaSeconds, this.model, this.lastHitter);
+      if (collected) this.events.emit(GAME_EVENTS.POWER_UP_COLLECTED, collected);
       if (goal) {
         const shield = this.powerUps.blockGoal(goal, this.model);
         if (shield) {

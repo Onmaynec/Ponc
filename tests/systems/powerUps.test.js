@@ -51,7 +51,9 @@ test('turbo accelerates a live ball while observing an upper speed cap', () => {
   state.ball.y = system.pickup.y;
   system.step(0.01, state, 'ai');
   assert.ok(state.ball.vx > 300);
-  assert.ok(Math.hypot(state.ball.vx, state.ball.vy) <= GAME_CONFIG.ball.maximumSpeed * 1.25);
+  assert.ok(
+    Math.hypot(state.ball.vx, state.ball.vy) <= GAME_CONFIG.ball.maximumSpeed * 1.25,
+  );
 });
 
 test('shield blocks a single goal then is consumed', () => {

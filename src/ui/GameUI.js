@@ -159,9 +159,10 @@ export class GameUI {
       [RULESETS.SUDDEN_DEATH]: 'Первое очко решает весь матч.',
       [RULESETS.TIME_ATTACK]: '90 секунд активной игры. При ничьей — решающее очко.',
     };
-    const extras = this.elements.powerUpsSelect.value === 'on'
-      ? ' Усиления: ловите шаром капсулы, чтобы получить бонус.'
-      : '';
+    const extras =
+      this.elements.powerUpsSelect.value === 'on'
+        ? ' Усиления: ловите шаром капсулы, чтобы получить бонус.'
+        : '';
     this.elements.modeHint.textContent = `${controls} ${rules[ruleset]}${extras}`;
   }
 

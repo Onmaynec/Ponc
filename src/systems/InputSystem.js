@@ -137,8 +137,9 @@ export class InputSystem {
   handlePointerMove(event) {
     this.setPointerFromClientY(event.clientY);
     if (event.pointerType === 'touch' && this.pointerSides.has(event.pointerId)) {
-      this.touchTargets[this.pointerSides.get(event.pointerId)] =
-        this.clientYToField(event.clientY);
+      this.touchTargets[this.pointerSides.get(event.pointerId)] = this.clientYToField(
+        event.clientY,
+      );
     }
   }
 
@@ -149,7 +150,11 @@ export class InputSystem {
       const side = event.clientX < rect.left + rect.width / 2 ? 'player' : 'ai';
       this.pointerSides.set(event.pointerId, side);
       this.touchTargets[side] = this.clientYToField(event.clientY);
-      try { this.canvas.setPointerCapture(event.pointerId); } catch { /* optional */ }
+      try {
+        this.canvas.setPointerCapture(event.pointerId);
+      } catch {
+        /* optional */
+      }
     }
     this.canvas.focus({ preventScroll: true });
   }
@@ -158,8 +163,7 @@ export class InputSystem {
     if (!this.pointerSides.has(event.pointerId)) return;
     const side = this.pointerSides.get(event.pointerId);
     this.pointerSides.delete(event.pointerId);
-    if (![...this.pointerSides.values()].includes(side))
-      this.touchTargets[side] = null;
+    if (![...this.pointerSides.values()].includes(side)) this.touchTargets[side] = null;
   }
   handleBlur() {
     this.reset();
