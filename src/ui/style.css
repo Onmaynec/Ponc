@@ -611,3 +611,20 @@ html[data-power-ups='false'] .powerup-legend {
     gap: 7px;
   }
 }
+
+/* Arena Trials 1.6 — selection, survival records and responsive arena HUD */
+.arena-metric{color:#ffb36e;font-weight:850}
+.survival-metric{color:#ffcf78;font-weight:900}
+.survival-metric b{font-size:15px}
+.records-grid{margin-top:15px}
+.record-panel{background:linear-gradient(150deg,#192332,#111729 68%)}
+.record-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.record-stats div{display:flex;flex-direction:column;gap:3px;border:1px solid #39516b55;padding:12px;border-radius:10px;background:#0b17277d}
+.record-stats strong{font-size:33px;font-weight:900;line-height:1.15;color:#ffca7e;font-variant-numeric:tabular-nums}
+.record-stats span{font-size:11px;color:#95abc1}
+.records-list{padding:0;margin:16px 0 0;list-style:none;display:grid;gap:7px}
+.records-list li{padding:9px 11px;border-radius:8px;background:#142538;color:#bdd6e5;font-size:12px;line-height:1.35}
+.record-panel .records-list li:first-child{border:1px solid #ecab6466;color:#ffd79d;background:#3b2b2f66}
+html[data-arena="flux"] .game-stage{border-color:#74506b;box-shadow:0 24px 70px #31234266,0 0 0 1px #ffaf6a44}
+html[data-ruleset="survival"] .scoreboard{border-color:#9b754b;background:#241e2d}
+@media(max-width:420px){.match-metrics{gap:6px;font-size:9px}.arena-metric{font-size:9px}.records-list li{font-size:11px}}

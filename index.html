@@ -8,7 +8,7 @@
       name="description"
       content="Ponc — динамичный браузерный Pong с режимом на двоих, сложностью ИИ и статистикой матчей."
     />
-    <title>Ponc 1.5.0 — Power-Up Arena</title>
+    <title>Ponc 1.6.0 — Arena Trials</title>
     <link rel="stylesheet" href="/src/ui/style.css" />
   </head>
   <body>
@@ -20,7 +20,7 @@
           <h1>PONC<span class="brand-mark">.</span></h1>
           <p class="subtitle">Быстрее. Точнее. До последнего очка.</p>
         </div>
-        <p class="header-edition">ARCADE EDITION <span data-app-version>1.5.0</span></p>
+        <p class="header-edition">ARCADE EDITION <span data-app-version>1.6.0</span></p>
       </header>
       <section class="game-area" aria-label="Игровая область Ponc">
         <div class="game-stage" id="gameStage">
@@ -57,6 +57,13 @@
                     <option value="classic">Классика</option>
                     <option value="sudden">Решающее очко</option>
                     <option value="timed">На время — 90 секунд</option>
+                    <option value="survival">Выживание — 3 жизни</option>
+                  </select></label
+                >
+                <label class="setting-field" for="arenaSelect"
+                  >Арена<select id="arenaSelect">
+                    <option value="classic">Classic · открытое поле</option>
+                    <option value="flux">FLUX · движущийся отражатель</option>
                   </select></label
                 >
                 <label class="setting-field" for="powerUpsSelect"
@@ -136,6 +143,8 @@
         <div class="game-toolbar">
           <div class="match-metrics">
             <span id="matchRuleLabel">КЛАССИКА</span>
+            <span id="arenaMetric" class="arena-metric">АРЕНА CLASSIC</span>
+            <span id="survivalMetric" class="survival-metric" hidden>ЖИЗНИ <b id="survivalLives">3</b></span>
             <span id="matchClock" hidden>ОСТАЛОСЬ 90 С</span>
             <span id="powerUpInfo" hidden>Собирайте капсулы мячом</span>
             <span id="powerUpCounter" class="powerup-counter" aria-label="Всего усилений"
@@ -225,9 +234,25 @@
           </p>
         </div>
       </section>
+      <section class="lower-grid records-grid" aria-label="Локальные рекорды и последние матчи">
+        <div class="panel record-panel">
+          <p class="panel-heading">ИСПЫТАНИЕ НА ВЫЖИВАНИЕ <span>PERSONAL BEST</span></p>
+          <div class="record-stats">
+            <div><strong id="survivalBest">0</strong><span>лучший результат</span></div>
+            <div><strong id="survivalRuns">0</strong><span>забегов</span></div>
+          </div>
+          <ol id="survivalLeaderboard" class="records-list"></ol>
+          <p class="panel-footnote">Личный топ-5 одиночных испытаний. Рекорды сохраняются только в этом браузере.</p>
+        </div>
+        <div class="panel">
+          <p class="panel-heading">ПОСЛЕДНИЕ МАТЧИ <span>HISTORY</span></p>
+          <ul id="recentMatchesList" class="records-list"></ul>
+          <p class="panel-footnote">История хранит до 50 завершённых матчей.</p>
+        </div>
+      </section>
       <footer class="footer">
         <span>PONC · MADE FOR THE RALLY</span
-        ><span>BUILD <span data-app-version>1.5.0</span></span>
+        ><span>BUILD <span data-app-version>1.6.0</span></span>
       </footer>
     </main>
     <script type="module" src="/src/main.js"></script>

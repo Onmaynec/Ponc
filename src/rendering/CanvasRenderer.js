@@ -80,7 +80,41 @@ export class CanvasRenderer {
       this.drawPowerUp(snapshot.powerUps.pickup);
       this.drawShield(snapshot.powerUps.shield, snapshot.field);
     }
+    if (snapshot.arena?.enabled) this.drawArenaHazard(snapshot.arena.hazard);
+    if (snapshot.settings.ruleset === 'survival')
+      this.drawSurvivalIndicator(snapshot.survivalLives);
     this.drawBall(snapshot.ball);
+  }
+
+  drawArenaHazard(hazard) {
+    if (!hazard) return;
+    const ctx = this.context;
+    const { x, y, width, height } = hazard;
+    ctx.save();
+    ctx.shadowColor = '#ffb764';
+    ctx.shadowBlur = 35;
+    const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
+    gradient.addColorStop(0, '#ffd996');
+    gradient.addColorStop(0.5, '#ff9b59');
+    gradient.addColorStop(1, '#d95c73');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, width, height);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#552944';
+    for (let cy = y + 9; cy < y + height - 4; cy += 15) {
+      ctx.fillRect(x + 4, cy, width - 8, 5);
+    }
+    ctx.restore();
+  }
+
+  drawSurvivalIndicator(lives) {
+    const ctx = this.context;
+    ctx.save();
+    ctx.fillStyle = '#ffcf78';
+    ctx.font = 'bold 15px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`ЖИЗНИ: ${'♥'.repeat(lives)}${'♡'.repeat(3 - lives)}`, this.config.field.width / 2, 25);
+    ctx.restore();
   }
 
   drawPowerUp(pickup) {
