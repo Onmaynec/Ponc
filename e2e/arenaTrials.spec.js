@@ -38,7 +38,7 @@ test('local survival leaderboards are rendered from validated saved records', as
   page,
 }) => {
   await page.addInitScript(() => {
-    localStorage.setItem(
+    window.localStorage.setItem(
       'ponc:survival-records:v1',
       JSON.stringify([
         {
