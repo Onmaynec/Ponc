@@ -26,6 +26,7 @@ export class SoundSystem {
       serve: [360, 0.075, 'sine'],
       power: [1100, 0.21, 'triangle'],
       shield: [220, 0.24, 'sawtooth'],
+      bumper: [520, 0.1, 'square'],
     };
     const [frequency, duration, waveform] = presets[type] || presets.paddle;
     try {

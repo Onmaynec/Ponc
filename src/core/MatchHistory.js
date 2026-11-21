@@ -32,6 +32,7 @@ export function saveMatchResult(storage, snapshot, now = new Date()) {
     mode: snapshot.settings.mode,
     difficulty: snapshot.settings.difficulty,
     ruleset: snapshot.settings.ruleset,
+    arena: snapshot.settings.arena,
     date: now.toISOString(),
   };
   const results = [entry, ...readMatchHistory(storage)].slice(0, MAX_MATCHES);
@@ -44,7 +45,7 @@ export function saveMatchResult(storage, snapshot, now = new Date()) {
 }
 
 export function summarizeHistory(history) {
-  const solo = history.filter((result) => result.mode === 'solo');
+  const solo = history.filter((result) => result.mode === 'solo' && result.ruleset !== 'survival');
   const wins = solo.filter((result) => result.winner === 'player').length;
   return {
     games: solo.length,

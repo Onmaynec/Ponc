@@ -1,3 +1,5 @@
+import { ARENAS } from '../systems/ArenaSystem.js';
+
 export const GAME_MODES = Object.freeze({ SOLO: 'solo', LOCAL: 'local' });
 export const DIFFICULTIES = Object.freeze({
   EASY: 'easy',
@@ -8,8 +10,10 @@ export const RULESETS = Object.freeze({
   CLASSIC: 'classic',
   SUDDEN_DEATH: 'sudden',
   TIME_ATTACK: 'timed',
+  SURVIVAL: 'survival',
 });
 export const TIME_ATTACK_SECONDS = 90;
+export const SURVIVAL_LIVES = 3;
 export const WINNING_SCORES = Object.freeze([5, 7, 11, 15]);
 export const DEFAULT_SETTINGS = Object.freeze({
   mode: GAME_MODES.SOLO,
@@ -17,10 +21,14 @@ export const DEFAULT_SETTINGS = Object.freeze({
   winningScore: 11,
   ruleset: RULESETS.CLASSIC,
   powerUps: false,
+  arena: ARENAS.CLASSIC,
 });
 
 export function normalizeSettings(input = {}) {
   return {
+    arena: Object.values(ARENAS).includes(input.arena)
+      ? input.arena
+      : DEFAULT_SETTINGS.arena,
     powerUps: input.powerUps === true || input.powerUps === 'on',
     ruleset: Object.values(RULESETS).includes(input.ruleset)
       ? input.ruleset

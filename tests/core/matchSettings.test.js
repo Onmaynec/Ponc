@@ -27,6 +27,7 @@ test('normalizes match choices and rejects arbitrary score limits', () => {
       winningScore: 7,
       ruleset: 'classic',
       powerUps: false,
+      arena: 'classic',
     },
   );
   assert.equal(normalizeSettings({ winningScore: -20 }).winningScore, 11);

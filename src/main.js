@@ -3,12 +3,13 @@ import { GameCore } from './core/GameCore.js';
 import { GAME_EVENTS } from './core/constants.js';
 import { GameLoop } from './core/GameLoop.js';
 import { readMatchHistory, saveMatchResult } from './core/MatchHistory.js';
+import { readSurvivalRecords, saveSurvivalRecord } from './core/SurvivalRecords.js';
 import { CanvasRenderer } from './rendering/CanvasRenderer.js';
 import { InputSystem } from './systems/InputSystem.js';
 import { GameUI } from './ui/GameUI.js';
 import { SoundSystem } from './systems/SoundSystem.js';
 
-const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.5.0';
+const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '1.6.0';
 
 function bootstrap() {
   const canvas = document.getElementById('gameCanvas');
@@ -26,6 +27,7 @@ function bootstrap() {
     /* storage blocked */
   }
   ui.setHistory(readMatchHistory(storage));
+  ui.setSurvivalRecords(readSurvivalRecords(storage));
   ui.bindPreferences(
     {
       sound: (enabled) => sound.setEnabled(enabled),
@@ -67,7 +69,9 @@ function bootstrap() {
     },
   };
   ui.bind(actions);
+  ui.bindMatchPresets(storage);
   core.events.on(GAME_EVENTS.SERVE_ACTIVE, () => sound.play('serve'));
+  core.events.on(GAME_EVENTS.ARENA_BOUNCE, () => sound.play('bumper'));
   core.events.on(GAME_EVENTS.POWER_UP_COLLECTED, (payload) => {
     sound.play('power');
     ui.showPowerUp(payload);
@@ -82,6 +86,7 @@ function bootstrap() {
   core.events.on(GAME_EVENTS.GAME_OVER, (snapshot) => {
     sound.play(snapshot.winner === 'player' ? 'win' : 'lose');
     ui.setHistory(saveMatchResult(storage, snapshot));
+    ui.setSurvivalRecords(saveSurvivalRecord(storage, snapshot));
   });
   input.attach();
   ui.setVersion(APP_VERSION);

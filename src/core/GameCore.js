@@ -4,6 +4,7 @@ import { createPaddle } from '../entities/createPaddle.js';
 import { AISystem } from '../systems/AISystem.js';
 import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { PowerUpSystem } from '../systems/PowerUpSystem.js';
+import { ArenaSystem, ARENAS } from '../systems/ArenaSystem.js';
 import { EventBus } from './EventBus.js';
 import { GAME_EVENTS, GAME_STATES, INPUT_MODES } from './constants.js';
 import { GameStateMachine } from './GameStateMachine.js';
@@ -12,6 +13,7 @@ import {
   GAME_MODES,
   RULESETS,
   TIME_ATTACK_SECONDS,
+  SURVIVAL_LIVES,
   normalizeSettings,
 } from './MatchSettings.js';
 
@@ -24,6 +26,7 @@ export class GameCore {
     this.physics = new PhysicsSystem(config);
     this.ai = new AISystem(config);
     this.powerUps = new PowerUpSystem(config, random);
+    this.arena = new ArenaSystem(config);
     this.lastHitter = null;
     this.settings = { ...DEFAULT_SETTINGS };
     this.pausedFromState = GAME_STATES.PLAYING;
@@ -34,6 +37,7 @@ export class GameCore {
     this.bestRally = 0;
     this.remainingSeconds = TIME_ATTACK_SECONDS;
     this.overtime = false;
+    this.survivalLives = SURVIVAL_LIVES;
     this.model = {
       ball: createBall(config),
       paddles: { player: createPaddle(config, 'player'), ai: createPaddle(config, 'ai') },
@@ -135,6 +139,10 @@ export class GameCore {
       this.rallyHits += 1;
       this.bestRally = Math.max(this.bestRally, this.rallyHits);
     }
+    if (this.settings.arena === ARENAS.FLUX) {
+      const collided = this.arena.step(deltaSeconds, this.model.ball);
+      if (collided) this.events.emit(GAME_EVENTS.ARENA_BOUNCE, this.getSnapshot());
+    }
     if (this.settings.powerUps) {
       const collected = this.powerUps.step(deltaSeconds, this.model, this.lastHitter);
       if (collected) this.events.emit(GAME_EVENTS.POWER_UP_COLLECTED, collected);
@@ -155,6 +163,7 @@ export class GameCore {
     this.rallyHits = 0;
     this.lastHitter = null;
     this.powerUps.resetRound(this.model);
+    this.arena.resetRound();
     this.countdownRemainingSeconds = this.config.match.countdownSeconds;
     this.stateMachine.transition(GAME_STATES.COUNTDOWN);
     this.events.emit(GAME_EVENTS.SERVE_STARTED, this.getSnapshot());
@@ -176,8 +185,11 @@ export class GameCore {
     if (side !== 'player' && side !== 'ai')
       throw new Error(`Unknown scoring side: ${side}`);
     this.score[side] += 1;
+    if (this.settings.ruleset === RULESETS.SURVIVAL && side === 'ai')
+      this.survivalLives = Math.max(0, this.survivalLives - 1);
     this.events.emit(GAME_EVENTS.GOAL, { side, score: { ...this.score } });
     if (
+      (this.settings.ruleset === RULESETS.SURVIVAL && this.survivalLives === 0) ||
       this.settings.ruleset === RULESETS.SUDDEN_DEATH ||
       (this.settings.ruleset === RULESETS.TIME_ATTACK && this.overtime) ||
       (this.settings.ruleset === RULESETS.CLASSIC &&
@@ -204,6 +216,8 @@ export class GameCore {
     this.overtime = false;
     this.lastHitter = null;
     this.powerUps.resetMatch(this.model);
+    this.arena.resetMatch();
+    this.survivalLives = SURVIVAL_LIVES;
   }
   resetPositions() {
     const centerY = this.config.field.height / 2 - this.config.paddle.height / 2;
@@ -239,6 +253,8 @@ export class GameCore {
       remainingSeconds: this.remainingSeconds,
       overtime: this.overtime,
       powerUps: this.powerUps.getSnapshot(this.settings.powerUps),
+      arena: this.arena.snapshot(this.settings.arena === ARENAS.FLUX),
+      survivalLives: this.survivalLives,
       field: { ...this.config.field },
       ball: { ...this.model.ball },
       paddles: {
