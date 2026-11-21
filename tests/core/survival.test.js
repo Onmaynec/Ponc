@@ -73,8 +73,10 @@ test('survival records persist, sort correctly and ignore other rulesets', () =>
   const storage = fakeStorage();
   const core = start();
   core.score.player = 6;
-  core.score.ai = 2;
-  core.awardPoint('ai');
+  for (let i = 0; i < 3; i++) {
+    inPlay(core);
+    core.awardPoint('ai');
+  }
   const record = core.getSnapshot();
   saveSurvivalRecord(storage, record, new Date('2026-11-21T12:00:00Z'));
   assert.equal(readSurvivalRecords(storage)[0].score, 6);
