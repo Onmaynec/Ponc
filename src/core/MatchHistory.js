@@ -45,7 +45,9 @@ export function saveMatchResult(storage, snapshot, now = new Date()) {
 }
 
 export function summarizeHistory(history) {
-  const solo = history.filter((result) => result.mode === 'solo' && result.ruleset !== 'survival');
+  const solo = history.filter(
+    (result) => result.mode === 'solo' && result.ruleset !== 'survival',
+  );
   const wins = solo.filter((result) => result.winner === 'player').length;
   return {
     games: solo.length,

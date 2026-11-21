@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('FLUX arena and survival challenge activate together in a real browser', async ({ page }) => {
+test('FLUX arena and survival challenge activate together in a real browser', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.locator('#modeSelect').selectOption('solo');
   await page.locator('#rulesetSelect').selectOption('survival');
@@ -32,13 +34,27 @@ test('match setup persists after page reload', async ({ page }) => {
   await expect(page.locator('#modeHint')).toContainText('FLUX');
 });
 
-test('local survival leaderboards are rendered from validated saved records', async ({ page }) => {
+test('local survival leaderboards are rendered from validated saved records', async ({
+  page,
+}) => {
   await page.addInitScript(() => {
     localStorage.setItem(
       'ponc:survival-records:v1',
       JSON.stringify([
-        { score: 4, difficulty: 'easy', arena: 'classic', powerUps: false, date: '2026-11-20T12:00:00Z' },
-        { score: 8, difficulty: 'hard', arena: 'flux', powerUps: true, date: '2026-11-21T12:00:00Z' },
+        {
+          score: 4,
+          difficulty: 'easy',
+          arena: 'classic',
+          powerUps: false,
+          date: '2026-11-20T12:00:00Z',
+        },
+        {
+          score: 8,
+          difficulty: 'hard',
+          arena: 'flux',
+          powerUps: true,
+          date: '2026-11-21T12:00:00Z',
+        },
       ]),
     );
   });

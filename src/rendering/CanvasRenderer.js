@@ -113,7 +113,11 @@ export class CanvasRenderer {
     ctx.fillStyle = '#ffcf78';
     ctx.font = 'bold 15px Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(`ЖИЗНИ: ${'♥'.repeat(lives)}${'♡'.repeat(3 - lives)}`, this.config.field.width / 2, 25);
+    ctx.fillText(
+      `ЖИЗНИ: ${'♥'.repeat(lives)}${'♡'.repeat(3 - lives)}`,
+      this.config.field.width / 2,
+      25,
+    );
     ctx.restore();
   }
 

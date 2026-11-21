@@ -20,8 +20,7 @@ function start() {
 }
 
 function inPlay(core) {
-  if (core.state === GAME_STATES.COUNTDOWN)
-    core.step(core.config.match.countdownSeconds);
+  if (core.state === GAME_STATES.COUNTDOWN) core.step(core.config.match.countdownSeconds);
 }
 
 test('survival counts scored goals and only ends after three conceded goals', () => {

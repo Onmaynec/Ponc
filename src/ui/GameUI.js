@@ -104,7 +104,9 @@ export class GameUI {
       this.elements.modeSelect.removeEventListener('change', modeChanged),
     );
     this.elements.arenaSelect.addEventListener('change', modeChanged);
-    this.cleanup.push(() => this.elements.arenaSelect.removeEventListener('change', modeChanged));
+    this.cleanup.push(() =>
+      this.elements.arenaSelect.removeEventListener('change', modeChanged),
+    );
     this.elements.powerUpsSelect.addEventListener('change', modeChanged);
     this.cleanup.push(() =>
       this.elements.powerUpsSelect.removeEventListener('change', modeChanged),
@@ -118,8 +120,12 @@ export class GameUI {
 
   bindMatchPresets(storage) {
     const names = [
-      'modeSelect', 'difficultySelect', 'rulesetSelect', 'winningScoreSelect',
-      'powerUpsSelect', 'arenaSelect',
+      'modeSelect',
+      'difficultySelect',
+      'rulesetSelect',
+      'winningScoreSelect',
+      'powerUpsSelect',
+      'arenaSelect',
     ];
     try {
       const saved = JSON.parse(storage?.getItem('ponc:match-presets:v1') || '{}');
@@ -127,7 +133,10 @@ export class GameUI {
         for (const name of names) {
           const value = saved[name];
           const select = this.elements[name];
-          if (typeof value === 'string' && [...select.options].some((option) => option.value === value))
+          if (
+            typeof value === 'string' &&
+            [...select.options].some((option) => option.value === value)
+          )
             select.value = value;
         }
       }
@@ -136,7 +145,9 @@ export class GameUI {
     }
     const persist = () => {
       try {
-        const settings = Object.fromEntries(names.map((name) => [name, this.elements[name].value]));
+        const settings = Object.fromEntries(
+          names.map((name) => [name, this.elements[name].value]),
+        );
         storage?.setItem('ponc:match-presets:v1', JSON.stringify(settings));
       } catch {
         // Browser storage is optional.
@@ -205,15 +216,17 @@ export class GameUI {
       [RULESETS.CLASSIC]: 'Побеждает первый, кто наберёт выбранное количество очков.',
       [RULESETS.SUDDEN_DEATH]: 'Первое очко решает весь матч.',
       [RULESETS.TIME_ATTACK]: '90 секунд активной игры. При ничьей — решающее очко.',
-      [RULESETS.SURVIVAL]: 'Испытание: забивай как можно больше, пока не пропустишь три мяча. Рекорд в одиночном режиме.',
+      [RULESETS.SURVIVAL]:
+        'Испытание: забивай как можно больше, пока не пропустишь три мяча. Рекорд в одиночном режиме.',
     };
     const extras =
       this.elements.powerUpsSelect.value === 'on'
         ? ' Усиления: ловите шаром капсулы, чтобы получить бонус.'
         : '';
-    const arena = this.elements.arenaSelect.value === ARENAS.FLUX
-      ? ' Арена FLUX: движущийся центральный отражатель меняет траекторию мяча.'
-      : '';
+    const arena =
+      this.elements.arenaSelect.value === ARENAS.FLUX
+        ? ' Арена FLUX: движущийся центральный отражатель меняет траекторию мяча.'
+        : '';
     this.elements.modeHint.textContent = `${controls} ${rules[ruleset]}${extras}${arena}`;
   }
 
@@ -224,25 +237,31 @@ export class GameUI {
     this.elements.careerRate.textContent = `${stats.winRate}%`;
     const recent = history.slice(0, 5);
     this.elements.recentMatchesList.replaceChildren(
-      ...(
-        recent.length
-          ? recent.map((result) => {
-              const li = this.root.createElement('li');
-              const label = result.ruleset === RULESETS.SURVIVAL
+      ...(recent.length
+        ? recent.map((result) => {
+            const li = this.root.createElement('li');
+            const label =
+              result.ruleset === RULESETS.SURVIVAL
                 ? 'Испытание'
-                : result.mode === GAME_MODES.LOCAL ? 'Дуэль' : 'Соло';
-              const outcome = result.ruleset === RULESETS.SURVIVAL
+                : result.mode === GAME_MODES.LOCAL
+                  ? 'Дуэль'
+                  : 'Соло';
+            const outcome =
+              result.ruleset === RULESETS.SURVIVAL
                 ? 'Рекорд'
-                : result.winner === 'player' ? 'Победа' : 'Поражение';
-              li.textContent = `${outcome} · ${result.playerScore}:${result.aiScore} · ${label}`;
-              return li;
-            })
-          : [(() => {
+                : result.winner === 'player'
+                  ? 'Победа'
+                  : 'Поражение';
+            li.textContent = `${outcome} · ${result.playerScore}:${result.aiScore} · ${label}`;
+            return li;
+          })
+        : [
+            (() => {
               const li = this.root.createElement('li');
               li.textContent = 'Здесь появятся результаты последних матчей.';
               return li;
-            })()]
-      ),
+            })(),
+          ]),
     );
     const unlocked = unlockedAchievements(history);
     this.elements.achievementCount.textContent = `${unlocked.filter((item) => item.unlocked).length}/${ACHIEVEMENTS.length}`;

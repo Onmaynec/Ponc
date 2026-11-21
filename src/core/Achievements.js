@@ -11,7 +11,9 @@ export const ACHIEVEMENTS = Object.freeze([
 ]);
 
 export function unlockedAchievements(history) {
-  const solo = history.filter((item) => item.mode === 'solo' && item.ruleset !== 'survival');
+  const solo = history.filter(
+    (item) => item.mode === 'solo' && item.ruleset !== 'survival',
+  );
   const wins = solo.filter((item) => item.winner === 'player');
   const unlocked = new Set();
   if (wins.length >= 1) unlocked.add('first_win');

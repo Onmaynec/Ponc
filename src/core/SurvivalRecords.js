@@ -29,7 +29,8 @@ export function saveSurvivalRecord(storage, snapshot, now = new Date()) {
     !snapshot.winner ||
     snapshot.settings.mode !== 'solo' ||
     snapshot.settings.ruleset !== 'survival'
-  ) return readSurvivalRecords(storage);
+  )
+    return readSurvivalRecords(storage);
   const record = {
     score: snapshot.score.player,
     difficulty: snapshot.settings.difficulty,
