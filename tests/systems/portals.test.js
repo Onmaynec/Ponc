@@ -3,7 +3,7 @@ import test from 'node:test';
 import { GAME_CONFIG } from '../../src/config/gameConfig.js';
 import { ArenaSystem } from '../../src/systems/ArenaSystem.js';
 import { GameCore } from '../../src/core/GameCore.js';
-import { GAME_EVENTS, GAME_STATES } from '../../src/core/constants.js';
+import { GAME_EVENTS } from '../../src/core/constants.js';
 
 test('entering a portal teleports the ball to the opposite gate', () => {
   const arena = new ArenaSystem(GAME_CONFIG);
