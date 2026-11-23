@@ -25,4 +25,5 @@ export const GAME_EVENTS = Object.freeze({
   ARENA_BOUNCE: 'arena:bounce',
   ARENA_PORTAL: 'arena:portal',
   CIRCUIT_ROUND: 'circuit:round',
+  TRAINING_SCORE: 'training:score',
 });

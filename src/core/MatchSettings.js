@@ -1,4 +1,5 @@
 import { ARENAS } from '../systems/ArenaSystem.js';
+import { normalizeDrill } from './TrainingSystem.js';
 
 export const GAME_MODES = Object.freeze({ SOLO: 'solo', LOCAL: 'local' });
 export const DIFFICULTIES = Object.freeze({
@@ -12,6 +13,7 @@ export const RULESETS = Object.freeze({
   TIME_ATTACK: 'timed',
   SURVIVAL: 'survival',
   CIRCUIT: 'circuit',
+  TRAINING: 'training',
 });
 export const TIME_ATTACK_SECONDS = 90;
 export const SURVIVAL_LIVES = 3;
@@ -23,20 +25,26 @@ export const DEFAULT_SETTINGS = Object.freeze({
   ruleset: RULESETS.CLASSIC,
   powerUps: false,
   arena: ARENAS.CLASSIC,
+  drill: 'precision',
 });
 
 export function normalizeSettings(input = {}) {
   const ruleset = Object.values(RULESETS).includes(input.ruleset)
     ? input.ruleset
     : DEFAULT_SETTINGS.ruleset;
+  const training = ruleset === RULESETS.TRAINING;
+  const soloOnly = training || ruleset === RULESETS.CIRCUIT;
   return {
-    arena: Object.values(ARENAS).includes(input.arena)
-      ? input.arena
-      : DEFAULT_SETTINGS.arena,
-    powerUps: input.powerUps === true || input.powerUps === 'on',
+    drill: normalizeDrill(input.drill),
+    arena: training
+      ? ARENAS.CLASSIC
+      : Object.values(ARENAS).includes(input.arena)
+        ? input.arena
+        : DEFAULT_SETTINGS.arena,
+    powerUps: !training && (input.powerUps === true || input.powerUps === 'on'),
     ruleset,
     mode:
-      ruleset === RULESETS.CIRCUIT
+      soloOnly
         ? GAME_MODES.SOLO
         : Object.values(GAME_MODES).includes(input.mode)
           ? input.mode

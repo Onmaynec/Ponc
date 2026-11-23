@@ -6,6 +6,7 @@ import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { PowerUpSystem } from '../systems/PowerUpSystem.js';
 import { ArenaSystem, ARENAS } from '../systems/ArenaSystem.js';
 import { CIRCUIT_STAGES, getCircuitProgress } from './ChampionshipCircuit.js';
+import { TrainingSystem, DRILL_PROFILES } from './TrainingSystem.js';
 import { EventBus } from './EventBus.js';
 import { GAME_EVENTS, GAME_STATES, INPUT_MODES } from './constants.js';
 import { GameStateMachine } from './GameStateMachine.js';
@@ -28,6 +29,7 @@ export class GameCore {
     this.ai = new AISystem(config);
     this.powerUps = new PowerUpSystem(config, random);
     this.arena = new ArenaSystem(config);
+    this.training = new TrainingSystem();
     this.lastHitter = null;
     this.settings = { ...DEFAULT_SETTINGS };
     this.pausedFromState = GAME_STATES.PLAYING;
@@ -112,6 +114,12 @@ export class GameCore {
       return;
     }
     if (this.state !== GAME_STATES.PLAYING) return;
+    if (this.settings.ruleset === RULESETS.TRAINING) {
+      if (this.training.tick(deltaSeconds)) {
+        this.finishMatch('player');
+        return;
+      }
+    }
     if (this.settings.ruleset === RULESETS.TIME_ATTACK && !this.overtime) {
       this.remainingSeconds = Math.max(0, this.remainingSeconds - deltaSeconds);
       if (this.remainingSeconds === 0) {
@@ -138,6 +146,11 @@ export class GameCore {
     );
     if (Math.sign(ballBefore.vx) !== Math.sign(this.model.ball.vx)) {
       this.lastHitter = this.model.ball.vx > 0 ? 'player' : 'ai';
+      if (this.settings.ruleset === RULESETS.TRAINING) {
+        const reward = this.training.onPaddleHit(this.lastHitter);
+        if (reward && reward.kind === 'rally' && reward.streak % 5 === 0)
+          this.events.emit(GAME_EVENTS.TRAINING_SCORE, reward);
+      }
       this.rallyHits += 1;
       this.bestRally = Math.max(this.bestRally, this.rallyHits);
     }
@@ -190,6 +203,15 @@ export class GameCore {
     if (side !== 'player' && side !== 'ai')
       throw new Error(`Unknown scoring side: ${side}`);
     this.score[side] += 1;
+    if (this.settings.ruleset === RULESETS.TRAINING) {
+      const reward = this.training.onGoal(side, this.model.ball.y, this.config.field.height);
+      if (reward) this.events.emit(GAME_EVENTS.TRAINING_SCORE, reward);
+      this.events.emit(GAME_EVENTS.GOAL, { side, score: { ...this.score } });
+      if (this.training.drill === 'reflex' && this.training.lives === 0)
+        this.finishMatch('ai');
+      else this.beginServe();
+      return true;
+    }
     if (this.settings.ruleset === RULESETS.SURVIVAL && side === 'ai')
       this.survivalLives = Math.max(0, this.survivalLives - 1);
     this.events.emit(GAME_EVENTS.GOAL, { side, score: { ...this.score } });
@@ -252,6 +274,16 @@ export class GameCore {
     };
   }
 
+  applyTrainingDrill() {
+    this.settings = {
+      ...this.settings,
+      mode: GAME_MODES.SOLO,
+      arena: ARENAS.CLASSIC,
+      powerUps: false,
+      difficulty: DRILL_PROFILES[this.training.drill].difficulty,
+    };
+  }
+
   finishMatch(side) {
     this.winner = side;
     this.stateMachine.transition(GAME_STATES.GAME_OVER);
@@ -271,7 +303,9 @@ export class GameCore {
     this.arena.resetMatch();
     this.survivalLives = SURVIVAL_LIVES;
     this.circuit = { round: 0, completed: 0, champion: false, results: [] };
+    this.training.reset(this.settings.drill);
     if (this.settings.ruleset === RULESETS.CIRCUIT) this.applyCircuitStage(0);
+    if (this.settings.ruleset === RULESETS.TRAINING) this.applyTrainingDrill();
   }
   resetPositions() {
     const centerY = this.config.field.height / 2 - this.config.paddle.height / 2;
@@ -309,6 +343,7 @@ export class GameCore {
       powerUps: this.powerUps.getSnapshot(this.settings.powerUps),
       arena: this.arena.snapshot(this.settings.arena),
       circuit: getCircuitProgress(this.circuit),
+      training: this.training.snapshot(this.settings.ruleset === RULESETS.TRAINING),
       survivalLives: this.survivalLives,
       field: { ...this.config.field },
       ball: { ...this.model.ball },

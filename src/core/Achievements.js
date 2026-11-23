@@ -12,7 +12,7 @@ export const ACHIEVEMENTS = Object.freeze([
 
 export function unlockedAchievements(history) {
   const solo = history.filter(
-    (item) => item.mode === 'solo' && !['survival', 'circuit'].includes(item.ruleset),
+    (item) => item.mode === 'solo' && !['survival', 'circuit', 'training'].includes(item.ruleset),
   );
   const wins = solo.filter((item) => item.winner === 'player');
   const unlocked = new Set();

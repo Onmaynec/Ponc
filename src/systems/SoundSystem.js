@@ -29,6 +29,8 @@ export class SoundSystem {
       bumper: [520, 0.1, 'square'],
       portal: [790, 0.14, 'sine'],
       round: [940, 0.24, 'triangle'],
+      precision: [1320, 0.16, 'triangle'],
+      combo: [1050, 0.2, 'sine'],
     };
     const [frequency, duration, waveform] = presets[type] || presets.paddle;
     try {

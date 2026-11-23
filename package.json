@@ -1,6 +1,6 @@
 {
   "name": "ponc",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
   "type": "module",
   "description": "A modular browser Pong game with local multiplayer, configurable AI, and deterministic gameplay.",
