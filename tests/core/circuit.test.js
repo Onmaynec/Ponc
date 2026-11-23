@@ -37,8 +37,14 @@ test('circuit validates solo-only mode and defines three escalating rounds', () 
   assert.equal(settings.mode, 'solo');
   assert.equal(CIRCUIT_STAGES.length, 3);
   assert.equal(getCircuitStage(3), null);
-  assert.deepEqual(CIRCUIT_STAGES.map((s) => s.winningScore), [3, 5, 7]);
-  assert.deepEqual(CIRCUIT_STAGES.map((s) => s.arena), ['classic', 'flux', 'portal']);
+  assert.deepEqual(
+    CIRCUIT_STAGES.map((s) => s.winningScore),
+    [3, 5, 7],
+  );
+  assert.deepEqual(
+    CIRCUIT_STAGES.map((s) => s.arena),
+    ['classic', 'flux', 'portal'],
+  );
 });
 
 test('tournament advances without emitting game over between rounds', () => {
@@ -135,16 +141,30 @@ test('trophies persist separately and corrupted records are rejected', () => {
     recent: records,
   });
   assert.deepEqual(readCircuitRecords({ getItem: () => 'not json' }), []);
-  assert.deepEqual(readCircuitRecords({ getItem: () => JSON.stringify([{ completed: 99, champion: true, date: 'today' }]) }), []);
-  saveCircuitResult(db, { ...core.getSnapshot(), settings: { mode: 'solo', ruleset: 'classic' } });
+  assert.deepEqual(
+    readCircuitRecords({
+      getItem: () => JSON.stringify([{ completed: 99, champion: true, date: 'today' }]),
+    }),
+    [],
+  );
+  saveCircuitResult(db, {
+    ...core.getSnapshot(),
+    settings: { mode: 'solo', ruleset: 'classic' },
+  });
   assert.equal(readCircuitRecords(db).length, 1);
 });
 
 test('circuit matches do not distort normal career or legacy achievements', () => {
-  const data = [{
-    mode: 'solo', winner: 'player', ruleset: 'circuit', playerScore: 7,
-    aiScore: 0, difficulty: 'hard',
-  }];
+  const data = [
+    {
+      mode: 'solo',
+      winner: 'player',
+      ruleset: 'circuit',
+      playerScore: 7,
+      aiScore: 0,
+      difficulty: 'hard',
+    },
+  ];
   assert.deepEqual(summarizeHistory(data), { games: 0, wins: 0, losses: 0, winRate: 0 });
   assert.ok(unlockedAchievements(data).every((item) => !item.unlocked));
 });

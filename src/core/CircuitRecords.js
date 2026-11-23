@@ -33,10 +33,7 @@ export function saveCircuitResult(storage, snapshot, now = new Date()) {
     snapshot.settings?.mode !== 'solo'
   )
     return readCircuitRecords(storage);
-  const completed = Math.max(
-    0,
-    Math.min(MAX_STAGES, snapshot.circuit?.completed ?? 0),
-  );
+  const completed = Math.max(0, Math.min(MAX_STAGES, snapshot.circuit?.completed ?? 0));
   const champion = snapshot.circuit?.champion === true && completed === MAX_STAGES;
   const entry = { completed, champion, date: now.toISOString() };
   const history = [entry, ...readCircuitRecords(storage)].slice(0, LIMIT);

@@ -699,20 +699,118 @@ html[data-ruleset='survival'] .scoreboard {
 }
 
 /* Championship Circuit: stage strip, trophy cabinet, and portal arena */
-.circuit-route{display:flex;gap:5px;margin:9px 0;flex-wrap:wrap}
-.circuit-route span{flex:1;min-width:90px;padding:7px 5px;text-align:center;border-radius:7px;background:#21324d;border:1px solid #48527d;color:#d2ddff;font-size:10px;font-weight:800}
-.circuit-metric{color:#c8bbff;font-weight:900}
-.championship-section{margin-top:16px;border:1px solid #465278;border-radius:14px;background:linear-gradient(135deg,#1b2940,#191626);padding:19px 22px}
-.championship-banner{display:flex;gap:18px;align-items:center;justify-content:space-between}
-.championship-kicker{font-size:10px;color:#b9afff;font-weight:900;letter-spacing:.17em}
-.championship-banner h2{font-size:clamp(18px,3vw,27px);line-height:1.18;letter-spacing:-.03em;margin:9px 0 8px}
-.championship-banner p{color:#9caec7;font-size:12px;max-width:640px;line-height:1.6;margin:0}
-.championship-trophy{font-size:clamp(50px,8vw,88px);color:#ffd287;line-height:1;text-shadow:0 0 35px #ffcb7773}
-.championship-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px}
-.championship-stats div{background:#0f1d3199;border-radius:10px;border:1px solid #465178;padding:12px;display:flex;gap:5px;flex-direction:column}
-.championship-stats strong{font-size:clamp(24px,4vw,35px);color:#ecd2ff;font-variant-numeric:tabular-nums}
-.championship-stats span{font-size:11px;color:#9aaec7}
-.championship-history{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-html[data-arena='portal'] .game-stage{border-color:#896eaf;box-shadow:0 24px 65px #4d2a755c,0 0 0 1px #bd83f55c}
-html[data-ruleset='circuit'] .scoreboard{background:#201d38;border-color:#645c8f}
-@media(max-width:460px){.championship-section{padding:15px}.championship-trophy{font-size:48px}.championship-stats div{padding:8px}.championship-stats span{font-size:10px}.circuit-route span{min-width:80px;font-size:9px}}
+.circuit-route {
+  display: flex;
+  gap: 5px;
+  margin: 9px 0;
+  flex-wrap: wrap;
+}
+.circuit-route span {
+  flex: 1;
+  min-width: 90px;
+  padding: 7px 5px;
+  text-align: center;
+  border-radius: 7px;
+  background: #21324d;
+  border: 1px solid #48527d;
+  color: #d2ddff;
+  font-size: 10px;
+  font-weight: 800;
+}
+.circuit-metric {
+  color: #c8bbff;
+  font-weight: 900;
+}
+.championship-section {
+  margin-top: 16px;
+  border: 1px solid #465278;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1b2940, #191626);
+  padding: 19px 22px;
+}
+.championship-banner {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+}
+.championship-kicker {
+  font-size: 10px;
+  color: #b9afff;
+  font-weight: 900;
+  letter-spacing: 0.17em;
+}
+.championship-banner h2 {
+  font-size: clamp(18px, 3vw, 27px);
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  margin: 9px 0 8px;
+}
+.championship-banner p {
+  color: #9caec7;
+  font-size: 12px;
+  max-width: 640px;
+  line-height: 1.6;
+  margin: 0;
+}
+.championship-trophy {
+  font-size: clamp(50px, 8vw, 88px);
+  color: #ffd287;
+  line-height: 1;
+  text-shadow: 0 0 35px #ffcb7773;
+}
+.championship-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+.championship-stats div {
+  background: #0f1d3199;
+  border-radius: 10px;
+  border: 1px solid #465178;
+  padding: 12px;
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+}
+.championship-stats strong {
+  font-size: clamp(24px, 4vw, 35px);
+  color: #ecd2ff;
+  font-variant-numeric: tabular-nums;
+}
+.championship-stats span {
+  font-size: 11px;
+  color: #9aaec7;
+}
+.championship-history {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+html[data-arena='portal'] .game-stage {
+  border-color: #896eaf;
+  box-shadow:
+    0 24px 65px #4d2a755c,
+    0 0 0 1px #bd83f55c;
+}
+html[data-ruleset='circuit'] .scoreboard {
+  background: #201d38;
+  border-color: #645c8f;
+}
+@media (max-width: 460px) {
+  .championship-section {
+    padding: 15px;
+  }
+  .championship-trophy {
+    font-size: 48px;
+  }
+  .championship-stats div {
+    padding: 8px;
+  }
+  .championship-stats span {
+    font-size: 10px;
+  }
+  .circuit-route span {
+    min-width: 80px;
+    font-size: 9px;
+  }
+}

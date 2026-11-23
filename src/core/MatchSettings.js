@@ -35,11 +35,12 @@ export function normalizeSettings(input = {}) {
       : DEFAULT_SETTINGS.arena,
     powerUps: input.powerUps === true || input.powerUps === 'on',
     ruleset,
-    mode: ruleset === RULESETS.CIRCUIT
-      ? GAME_MODES.SOLO
-      : Object.values(GAME_MODES).includes(input.mode)
-      ? input.mode
-      : DEFAULT_SETTINGS.mode,
+    mode:
+      ruleset === RULESETS.CIRCUIT
+        ? GAME_MODES.SOLO
+        : Object.values(GAME_MODES).includes(input.mode)
+          ? input.mode
+          : DEFAULT_SETTINGS.mode,
     difficulty: Object.values(DIFFICULTIES).includes(input.difficulty)
       ? input.difficulty
       : DEFAULT_SETTINGS.difficulty,

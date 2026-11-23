@@ -264,17 +264,19 @@ export class GameUI {
                 ? 'Чемпионат'
                 : result.ruleset === RULESETS.SURVIVAL
                   ? 'Испытание'
-                : result.mode === GAME_MODES.LOCAL
-                  ? 'Дуэль'
-                  : 'Соло';
+                  : result.mode === GAME_MODES.LOCAL
+                    ? 'Дуэль'
+                    : 'Соло';
             const outcome =
               result.ruleset === RULESETS.CIRCUIT
-                ? (result.winner === 'player' ? 'Кубок' : 'Вылет')
+                ? result.winner === 'player'
+                  ? 'Кубок'
+                  : 'Вылет'
                 : result.ruleset === RULESETS.SURVIVAL
                   ? 'Рекорд'
-                : result.winner === 'player'
-                  ? 'Победа'
-                  : 'Поражение';
+                  : result.winner === 'player'
+                    ? 'Победа'
+                    : 'Поражение';
             li.textContent = `${outcome} · ${result.playerScore}:${result.aiScore} · ${label}`;
             return li;
           })
@@ -337,8 +339,7 @@ export class GameUI {
   }
 
   showCircuitRound(stage) {
-    this.elements.powerUpAlert.textContent =
-      `ЭТАП ${stage.round}/${stage.total} — ${stage.stage.title.toUpperCase()}!`;
+    this.elements.powerUpAlert.textContent = `ЭТАП ${stage.round}/${stage.total} — ${stage.stage.title.toUpperCase()}!`;
     this.elements.powerUpAlert.hidden = false;
     if (this.alertTimeout !== null) window.clearTimeout(this.alertTimeout);
     this.alertTimeout = window.setTimeout(() => {
@@ -371,26 +372,25 @@ export class GameUI {
     elements.playerScore.textContent = String(snapshot.score.player);
     elements.aiScore.textContent = String(snapshot.score.ai);
     const circuitMode = snapshot.settings.ruleset === RULESETS.CIRCUIT;
-    elements.aiLabel.textContent =
-      circuitMode
-        ? snapshot.circuit.stage.title
-        : snapshot.settings.ruleset === RULESETS.SURVIVAL
-          ? 'Пропущено'
+    elements.aiLabel.textContent = circuitMode
+      ? snapshot.circuit.stage.title
+      : snapshot.settings.ruleset === RULESETS.SURVIVAL
+        ? 'Пропущено'
         : snapshot.settings.mode === GAME_MODES.LOCAL
           ? 'Игрок 2'
           : 'Компьютер';
     elements.rallyValue.textContent = String(snapshot.rallyHits);
     elements.bestRallyValue.textContent = String(snapshot.bestRally);
     const survival = snapshot.settings.ruleset === RULESETS.SURVIVAL;
-    elements.arenaMetric.textContent = snapshot.arena.mode === ARENAS.PORTAL
-      ? `PORTAL · ТЕЛЕПОРТЫ ${snapshot.arena.totalTeleports}`
-      : snapshot.arena.mode === ARENAS.FLUX
-        ? `FLUX · ОТРАЖЕНИЯ ${snapshot.arena.totalBounces}`
-        : 'АРЕНА CLASSIC';
+    elements.arenaMetric.textContent =
+      snapshot.arena.mode === ARENAS.PORTAL
+        ? `PORTAL · ТЕЛЕПОРТЫ ${snapshot.arena.totalTeleports}`
+        : snapshot.arena.mode === ARENAS.FLUX
+          ? `FLUX · ОТРАЖЕНИЯ ${snapshot.arena.totalBounces}`
+          : 'АРЕНА CLASSIC';
     elements.circuitMetric.hidden = !circuitMode;
     if (circuitMode) {
-      elements.circuitStage.textContent =
-        `${snapshot.circuit.round}/${snapshot.circuit.total} · ${snapshot.circuit.stage.title} · до ${snapshot.settings.winningScore}`;
+      elements.circuitStage.textContent = `${snapshot.circuit.round}/${snapshot.circuit.total} · ${snapshot.circuit.stage.title} · до ${snapshot.settings.winningScore}`;
     }
     elements.survivalMetric.hidden = !survival;
     elements.survivalLives.textContent = String(snapshot.survivalLives);
@@ -447,19 +447,21 @@ export class GameUI {
     if (snapshot.state === GAME_STATES.GAME_OVER) {
       const playerWon = snapshot.winner === 'player';
       elements.resultTitle.textContent = circuitMode
-        ? snapshot.circuit.champion ? 'Ты чемпион PONC!' : 'Чемпионат завершён'
+        ? snapshot.circuit.champion
+          ? 'Ты чемпион PONC!'
+          : 'Чемпионат завершён'
         : survival
           ? 'Испытание завершено'
-        : snapshot.settings.mode === GAME_MODES.LOCAL
-          ? `Победил игрок ${playerWon ? '1' : '2'}!`
-          : playerWon
-            ? 'Вы победили!'
-            : 'Победил компьютер';
+          : snapshot.settings.mode === GAME_MODES.LOCAL
+            ? `Победил игрок ${playerWon ? '1' : '2'}!`
+            : playerWon
+              ? 'Вы победили!'
+              : 'Победил компьютер';
       elements.resultScore.textContent = circuitMode
         ? `Этапов пройдено: ${snapshot.circuit.completed}/3. ${snapshot.circuit.champion ? 'Кубок завоёван!' : 'Попробуй ещё раз.'}`
         : survival
           ? `Твой результат: ${snapshot.score.player} очков. Лучшая серия: ${snapshot.bestRally}`
-        : `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}. Лучшая серия: ${snapshot.bestRally}`;
+          : `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}. Лучшая серия: ${snapshot.bestRally}`;
     }
     document.documentElement.dataset.gameState = snapshot.state;
     document.documentElement.dataset.powerUps = String(snapshot.powerUps.enabled);

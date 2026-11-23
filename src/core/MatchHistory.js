@@ -33,9 +33,10 @@ export function saveMatchResult(storage, snapshot, now = new Date()) {
     difficulty: snapshot.settings.difficulty,
     ruleset: snapshot.settings.ruleset,
     arena: snapshot.settings.arena,
-    circuitCompleted: snapshot.settings.ruleset === 'circuit'
-      ? snapshot.circuit?.completed ?? 0
-      : undefined,
+    circuitCompleted:
+      snapshot.settings.ruleset === 'circuit'
+        ? (snapshot.circuit?.completed ?? 0)
+        : undefined,
     date: now.toISOString(),
   };
   const results = [entry, ...readMatchHistory(storage)].slice(0, MAX_MATCHES);
@@ -49,7 +50,8 @@ export function saveMatchResult(storage, snapshot, now = new Date()) {
 
 export function summarizeHistory(history) {
   const solo = history.filter(
-    (result) => result.mode === 'solo' && !['survival', 'circuit'].includes(result.ruleset),
+    (result) =>
+      result.mode === 'solo' && !['survival', 'circuit'].includes(result.ruleset),
   );
   const wins = solo.filter((result) => result.winner === 'player').length;
   return {

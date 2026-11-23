@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('championship forces solo, selects first stage and displays progress HUD', async ({ page }) => {
+test('championship forces solo, selects first stage and displays progress HUD', async ({
+  page,
+}) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
@@ -52,7 +54,9 @@ test('trophy cabinet loads saved validated history', async ({ page }) => {
   await expect(page.locator('#circuitHistory li').first()).toContainText('ЧЕМПИОН');
 });
 
-test('circuit choice is restored after reload and mobile game starts', async ({ page }) => {
+test('circuit choice is restored after reload and mobile game starts', async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.goto('/');
   await page.locator('#rulesetSelect').selectOption('circuit');
