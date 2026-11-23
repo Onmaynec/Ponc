@@ -11,6 +11,7 @@ export const RULESETS = Object.freeze({
   SUDDEN_DEATH: 'sudden',
   TIME_ATTACK: 'timed',
   SURVIVAL: 'survival',
+  CIRCUIT: 'circuit',
 });
 export const TIME_ATTACK_SECONDS = 90;
 export const SURVIVAL_LIVES = 3;
@@ -25,15 +26,18 @@ export const DEFAULT_SETTINGS = Object.freeze({
 });
 
 export function normalizeSettings(input = {}) {
+  const ruleset = Object.values(RULESETS).includes(input.ruleset)
+    ? input.ruleset
+    : DEFAULT_SETTINGS.ruleset;
   return {
     arena: Object.values(ARENAS).includes(input.arena)
       ? input.arena
       : DEFAULT_SETTINGS.arena,
     powerUps: input.powerUps === true || input.powerUps === 'on',
-    ruleset: Object.values(RULESETS).includes(input.ruleset)
-      ? input.ruleset
-      : DEFAULT_SETTINGS.ruleset,
-    mode: Object.values(GAME_MODES).includes(input.mode)
+    ruleset,
+    mode: ruleset === RULESETS.CIRCUIT
+      ? GAME_MODES.SOLO
+      : Object.values(GAME_MODES).includes(input.mode)
       ? input.mode
       : DEFAULT_SETTINGS.mode,
     difficulty: Object.values(DIFFICULTIES).includes(input.difficulty)

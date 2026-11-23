@@ -23,4 +23,6 @@ export const GAME_EVENTS = Object.freeze({
   POWER_UP_COLLECTED: 'powerup:collected',
   POWER_UP_SHIELD: 'powerup:shield',
   ARENA_BOUNCE: 'arena:bounce',
+  ARENA_PORTAL: 'arena:portal',
+  CIRCUIT_ROUND: 'circuit:round',
 });

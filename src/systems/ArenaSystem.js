@@ -2,6 +2,7 @@
 export const ARENAS = Object.freeze({
   CLASSIC: 'classic',
   FLUX: 'flux',
+  PORTAL: 'portal',
 });
 
 const HAZARD_WIDTH = 16;
@@ -21,6 +22,7 @@ export class ArenaSystem {
 
   resetMatch() {
     this.totalBounces = 0;
+    this.totalTeleports = 0;
     this.resetRound();
   }
 
@@ -33,6 +35,11 @@ export class ArenaSystem {
       height: HAZARD_HEIGHT,
       velocityY: HAZARD_SPEED,
     };
+    this.portals = [
+      { x: width * 0.35, y: height * 0.3, radius: 24 },
+      { x: width * 0.65, y: height * 0.7, radius: 24 },
+    ];
+    this.portalCooldown = 0;
   }
 
   step(deltaSeconds, ball) {
@@ -82,11 +89,34 @@ export class ArenaSystem {
     return true;
   }
 
-  snapshot(enabled) {
+  // A teleport preserves the velocity vector; cooldown prevents ping-pong loops.
+  stepPortal(deltaSeconds, ball) {
+    if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0) return false;
+    this.portalCooldown = Math.max(0, this.portalCooldown - deltaSeconds);
+    if (this.portalCooldown > 0) return false;
+    const entry = this.portals.findIndex(
+      (portal) =>
+        Math.hypot(ball.x - portal.x, ball.y - portal.y) <= portal.radius + ball.radius,
+    );
+    if (entry === -1) return false;
+    const exit = this.portals[1 - entry];
+    ball.x = exit.x;
+    ball.y = exit.y;
+    this.portalCooldown = 0.65;
+    this.totalTeleports += 1;
+    return true;
+  }
+
+  snapshot(mode) {
+    const portal = mode === ARENAS.PORTAL;
+    const flux = mode === ARENAS.FLUX || mode === true;
     return {
-      enabled: Boolean(enabled),
-      hazard: enabled ? { ...this.hazard } : null,
+      enabled: portal || flux,
+      mode: portal ? ARENAS.PORTAL : flux ? ARENAS.FLUX : ARENAS.CLASSIC,
+      hazard: flux ? { ...this.hazard } : null,
+      portals: portal ? this.portals.map((item) => ({ ...item })) : null,
       totalBounces: this.totalBounces,
+      totalTeleports: this.totalTeleports,
     };
   }
 }

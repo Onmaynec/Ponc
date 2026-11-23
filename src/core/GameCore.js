@@ -5,6 +5,7 @@ import { AISystem } from '../systems/AISystem.js';
 import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { PowerUpSystem } from '../systems/PowerUpSystem.js';
 import { ArenaSystem, ARENAS } from '../systems/ArenaSystem.js';
+import { CIRCUIT_STAGES, getCircuitProgress } from './ChampionshipCircuit.js';
 import { EventBus } from './EventBus.js';
 import { GAME_EVENTS, GAME_STATES, INPUT_MODES } from './constants.js';
 import { GameStateMachine } from './GameStateMachine.js';
@@ -38,6 +39,7 @@ export class GameCore {
     this.remainingSeconds = TIME_ATTACK_SECONDS;
     this.overtime = false;
     this.survivalLives = SURVIVAL_LIVES;
+    this.circuit = { round: 0, completed: 0, champion: false, results: [] };
     this.model = {
       ball: createBall(config),
       paddles: { player: createPaddle(config, 'player'), ai: createPaddle(config, 'ai') },
@@ -142,6 +144,9 @@ export class GameCore {
     if (this.settings.arena === ARENAS.FLUX) {
       const collided = this.arena.step(deltaSeconds, this.model.ball);
       if (collided) this.events.emit(GAME_EVENTS.ARENA_BOUNCE, this.getSnapshot());
+    } else if (this.settings.arena === ARENAS.PORTAL) {
+      const teleported = this.arena.stepPortal(deltaSeconds, this.model.ball);
+      if (teleported) this.events.emit(GAME_EVENTS.ARENA_PORTAL, this.getSnapshot());
     }
     if (this.settings.powerUps) {
       const collected = this.powerUps.step(deltaSeconds, this.model, this.lastHitter);
@@ -188,6 +193,10 @@ export class GameCore {
     if (this.settings.ruleset === RULESETS.SURVIVAL && side === 'ai')
       this.survivalLives = Math.max(0, this.survivalLives - 1);
     this.events.emit(GAME_EVENTS.GOAL, { side, score: { ...this.score } });
+    if (this.settings.ruleset === RULESETS.CIRCUIT) {
+      this.awardCircuitPoint(side);
+      return true;
+    }
     if (
       (this.settings.ruleset === RULESETS.SURVIVAL && this.survivalLives === 0) ||
       this.settings.ruleset === RULESETS.SUDDEN_DEATH ||
@@ -198,6 +207,49 @@ export class GameCore {
       this.finishMatch(side);
     else this.beginServe();
     return true;
+  }
+
+  awardCircuitPoint(side) {
+    if (this.score[side] < this.settings.winningScore) {
+      this.beginServe();
+      return;
+    }
+    const stage = CIRCUIT_STAGES[this.circuit.round];
+    this.circuit.results.push({
+      stage: stage.id,
+      winner: side,
+      score: { ...this.score },
+    });
+    if (side === 'ai') {
+      this.finishMatch('ai');
+      return;
+    }
+    this.circuit.completed += 1;
+    if (this.circuit.completed === CIRCUIT_STAGES.length) {
+      this.circuit.champion = true;
+      this.finishMatch('player');
+      return;
+    }
+    this.circuit.round += 1;
+    this.applyCircuitStage(this.circuit.round);
+    this.score = { player: 0, ai: 0 };
+    this.resetPositions();
+    this.powerUps.resetMatch(this.model);
+    this.arena.resetMatch();
+    this.beginServe();
+    this.events.emit(GAME_EVENTS.CIRCUIT_ROUND, this.getSnapshot().circuit);
+  }
+
+  applyCircuitStage(round) {
+    const stage = CIRCUIT_STAGES[round];
+    this.settings = {
+      ...this.settings,
+      mode: GAME_MODES.SOLO,
+      difficulty: stage.difficulty,
+      arena: stage.arena,
+      powerUps: stage.powerUps,
+      winningScore: stage.winningScore,
+    };
   }
 
   finishMatch(side) {
@@ -218,6 +270,8 @@ export class GameCore {
     this.powerUps.resetMatch(this.model);
     this.arena.resetMatch();
     this.survivalLives = SURVIVAL_LIVES;
+    this.circuit = { round: 0, completed: 0, champion: false, results: [] };
+    if (this.settings.ruleset === RULESETS.CIRCUIT) this.applyCircuitStage(0);
   }
   resetPositions() {
     const centerY = this.config.field.height / 2 - this.config.paddle.height / 2;
@@ -253,7 +307,8 @@ export class GameCore {
       remainingSeconds: this.remainingSeconds,
       overtime: this.overtime,
       powerUps: this.powerUps.getSnapshot(this.settings.powerUps),
-      arena: this.arena.snapshot(this.settings.arena === ARENAS.FLUX),
+      arena: this.arena.snapshot(this.settings.arena),
+      circuit: getCircuitProgress(this.circuit),
       survivalLives: this.survivalLives,
       field: { ...this.config.field },
       ball: { ...this.model.ball },
