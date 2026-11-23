@@ -8,7 +8,7 @@
       name="description"
       content="Ponc — динамичный браузерный Pong с режимом на двоих, сложностью ИИ и статистикой матчей."
     />
-    <title>Ponc 1.7.0 — Championship Circuit</title>
+    <title>Ponc 1.8.0 — Precision Academy</title>
     <link rel="stylesheet" href="/src/ui/style.css" />
   </head>
   <body>
@@ -20,7 +20,7 @@
           <h1>PONC<span class="brand-mark">.</span></h1>
           <p class="subtitle">Быстрее. Точнее. До последнего очка.</p>
         </div>
-        <p class="header-edition">ARCADE EDITION <span data-app-version>1.7.0</span></p>
+        <p class="header-edition">ARCADE EDITION <span data-app-version>1.8.0</span></p>
       </header>
       <section class="game-area" aria-label="Игровая область Ponc">
         <div class="game-stage" id="gameStage">
@@ -39,7 +39,7 @@
                 Один против компьютера или вдвоём на одной клавиатуре.
               </p>
               <div class="match-settings">
-                <label class="setting-field" for="modeSelect"
+                <label class="setting-field" id="modeField" for="modeSelect"
                   >Режим<select id="modeSelect">
                     <option value="solo">Против компьютера</option>
                     <option value="local">Два игрока локально</option>
@@ -59,16 +59,24 @@
                     <option value="timed">На время — 90 секунд</option>
                     <option value="survival">Выживание — 3 жизни</option>
                     <option value="circuit">Чемпионат — 3 этапа</option>
+                    <option value="training">Академия — 60 секунд</option>
                   </select></label
                 >
-                <label class="setting-field" for="arenaSelect"
+                <label class="setting-field" id="trainingDrillField" for="trainingDrillSelect" hidden
+                  >Упражнение<select id="trainingDrillSelect">
+                    <option value="precision">Меткость · цель x3</option>
+                    <option value="rally">Контроль · комбо x5</option>
+                    <option value="reflex">Реакция · 3 жизни</option>
+                  </select></label
+                >
+                <label class="setting-field" id="arenaField" for="arenaSelect"
                   >Арена<select id="arenaSelect">
                     <option value="classic">Classic · открытое поле</option>
                     <option value="flux">FLUX · движущийся отражатель</option>
                     <option value="portal">PORTAL · парные порталы</option>
                   </select></label
                 >
-                <label class="setting-field" for="powerUpsSelect"
+                <label class="setting-field" id="powerUpsField" for="powerUpsSelect"
                   >Бонусы на арене<select id="powerUpsSelect">
                     <option value="off" selected>Классическая арена</option>
                     <option value="on">Силовые капсулы</option>
@@ -163,6 +171,10 @@
               >ЖИЗНИ <b id="survivalLives">3</b></span
             >
             <span id="matchClock" hidden>ОСТАЛОСЬ 90 С</span>
+            <span id="trainingMetric" class="training-metric" hidden>
+              ТРЕНИРОВКА <b id="trainingPoints">0</b> ОЧК. · <b id="trainingClock">60 С</b>
+              <span id="trainingDetails">Цель: ВЕРХ</span>
+            </span>
             <span id="powerUpInfo" hidden>Собирайте капсулы мячом</span>
             <span id="powerUpCounter" class="powerup-counter" aria-label="Всего усилений"
               >0</span
@@ -291,9 +303,28 @@
         </div>
         <ul id="circuitHistory" class="records-list championship-history"></ul>
       </section>
+      <section class="academy-section" aria-label="Тренировочная академия и рекорды">
+        <div class="academy-heading">
+          <div>
+            <span class="academy-kicker">PRECISION ACADEMY / TRAINING LAB</span>
+            <h2>ТОЧНОСТЬ. КОНТРОЛЬ. РЕАКЦИЯ.</h2>
+            <p>Три упражнения по 60 секунд активного времени. Тренируй удары, собирай серии и отбивай атаки эксперта.</p>
+          </div>
+          <div class="academy-mark" aria-hidden="true">◎</div>
+        </div>
+        <div class="academy-record-grid">
+          <div><span>МЕТКОСТЬ</span><strong id="trainingPrecisionBest">0</strong><small>лучший результат</small></div>
+          <div><span>КОНТРОЛЬ</span><strong id="trainingRallyBest">0</strong><small>лучший результат</small></div>
+          <div><span>РЕАКЦИЯ</span><strong id="trainingReflexBest">0</strong><small>лучший результат</small></div>
+        </div>
+        <div class="academy-bottom">
+          <span>ВСЕГО ТРЕНИРОВОК: <b id="trainingAttempts">0</b></span>
+          <ul id="trainingHistory" class="records-list academy-history"></ul>
+        </div>
+      </section>
       <footer class="footer">
         <span>PONC · MADE FOR THE RALLY</span
-        ><span>BUILD <span data-app-version>1.7.0</span></span>
+        ><span>BUILD <span data-app-version>1.8.0</span></span>
       </footer>
     </main>
     <script type="module" src="/src/main.js"></script>

@@ -82,9 +82,47 @@ export class CanvasRenderer {
     }
     if (snapshot.arena?.hazard) this.drawArenaHazard(snapshot.arena.hazard);
     if (snapshot.arena?.portals) this.drawPortals(snapshot.arena.portals);
+    if (snapshot.training?.enabled) this.drawTrainingOverlay(snapshot.training, snapshot.field);
     if (snapshot.settings.ruleset === 'survival')
       this.drawSurvivalIndicator(snapshot.survivalLives);
     this.drawBall(snapshot.ball);
+  }
+
+  drawTrainingOverlay(training, field) {
+    const ctx = this.context;
+    if (training.drill === 'precision') {
+      const top = training.target === 'top';
+      const height = field.height * 0.34;
+      const y = top ? 0 : field.height - height;
+      ctx.save();
+      const gradient = ctx.createLinearGradient(field.width - 90, 0, field.width, 0);
+      gradient.addColorStop(0, 'rgba(78,238,198,0)');
+      gradient.addColorStop(1, 'rgba(78,238,198,0.21)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(field.width - 90, y, 90, height);
+      ctx.shadowColor = '#68ffd5';
+      ctx.shadowBlur = 23;
+      ctx.strokeStyle = '#68ffd5';
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.moveTo(field.width - 4, y + 4);
+      ctx.lineTo(field.width - 4, y + height - 4);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.font = 'bold 12px Arial, sans-serif';
+      ctx.fillStyle = '#e3fffa';
+      ctx.textAlign = 'right';
+      ctx.fillText('x3 TARGET', field.width - 17, top ? 26 : field.height - 14);
+      ctx.restore();
+    }
+    if (training.drill === 'reflex') {
+      ctx.save();
+      ctx.strokeStyle = '#ffbf8c';
+      ctx.globalAlpha = 0.65;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(2, 9, 9, field.height - 18);
+      ctx.restore();
+    }
   }
 
   drawPortals(portals) {

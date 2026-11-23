@@ -4,6 +4,8 @@ import { normalizeSettings, GAME_MODES, RULESETS } from '../core/MatchSettings.j
 import { summarizeHistory } from '../core/MatchHistory.js';
 import { summarizeSurvival } from '../core/SurvivalRecords.js';
 import { summarizeCircuit } from '../core/CircuitRecords.js';
+import { summarizeTraining } from '../core/TrainingRecords.js';
+import { DRILL_PROFILES } from '../core/TrainingSystem.js';
 import { ARENAS } from '../systems/ArenaSystem.js';
 
 const STATE_LABELS = Object.freeze({
@@ -43,6 +45,20 @@ export class GameUI {
       'gameOverMenuButton',
       'fatalError',
       'modeSelect',
+      'modeField',
+      'arenaField',
+      'powerUpsField',
+      'trainingDrillField',
+      'trainingDrillSelect',
+      'trainingMetric',
+      'trainingPoints',
+      'trainingClock',
+      'trainingDetails',
+      'trainingPrecisionBest',
+      'trainingRallyBest',
+      'trainingReflexBest',
+      'trainingAttempts',
+      'trainingHistory',
       'powerUpsSelect',
       'arenaSelect',
       'arenaMetric',
@@ -119,6 +135,8 @@ export class GameUI {
     this.cleanup.push(() =>
       this.elements.powerUpsSelect.removeEventListener('change', modeChanged),
     );
+    this.elements.trainingDrillSelect.addEventListener('change', modeChanged);
+    this.cleanup.push(() => this.elements.trainingDrillSelect.removeEventListener('change', modeChanged));
     this.elements.rulesetSelect.addEventListener('change', modeChanged);
     this.cleanup.push(() =>
       this.elements.rulesetSelect.removeEventListener('change', modeChanged),
@@ -134,6 +152,7 @@ export class GameUI {
       'winningScoreSelect',
       'powerUpsSelect',
       'arenaSelect',
+      'trainingDrillSelect',
     ];
     try {
       const saved = JSON.parse(storage?.getItem('ponc:match-presets:v1') || '{}');
@@ -207,6 +226,7 @@ export class GameUI {
       ruleset: this.elements.rulesetSelect.value,
       powerUps: this.elements.powerUpsSelect.value === 'on',
       arena: this.elements.arenaSelect.value,
+      drill: this.elements.trainingDrillSelect.value,
       difficulty: this.elements.difficultySelect.value,
       winningScore: Number(this.elements.winningScoreSelect.value),
     });
@@ -215,14 +235,20 @@ export class GameUI {
   updateModeHint() {
     const ruleset = this.elements.rulesetSelect.value;
     const circuit = ruleset === RULESETS.CIRCUIT;
-    if (circuit) this.elements.modeSelect.value = GAME_MODES.SOLO;
-    this.elements.modeSelect.disabled = circuit;
-    this.elements.difficultySelect.disabled = circuit;
-    this.elements.arenaSelect.disabled = circuit;
-    this.elements.powerUpsSelect.disabled = circuit;
+    const training = ruleset === RULESETS.TRAINING;
+    const locked = circuit || training;
+    if (locked) this.elements.modeSelect.value = GAME_MODES.SOLO;
+    this.elements.modeSelect.disabled = locked;
+    this.elements.difficultySelect.disabled = locked;
+    this.elements.arenaSelect.disabled = locked;
+    this.elements.powerUpsSelect.disabled = locked;
+    this.elements.modeField.hidden = training;
+    this.elements.arenaField.hidden = training;
+    this.elements.powerUpsField.hidden = training;
+    this.elements.trainingDrillField.hidden = !training;
     this.elements.circuitRoute.hidden = !circuit;
     const local = this.elements.modeSelect.value === GAME_MODES.LOCAL;
-    this.elements.difficultyField.hidden = local;
+    this.elements.difficultyField.hidden = local || training;
     this.elements.winningScoreField.hidden = ruleset !== RULESETS.CLASSIC;
     const controls = local
       ? 'Игрок 1: W / S · Игрок 2: ↑ / ↓. На телефоне — два касания по сторонам поля.'
@@ -235,6 +261,8 @@ export class GameUI {
         'Испытание: забивай как можно больше, пока не пропустишь три мяча. Рекорд в одиночном режиме.',
       [RULESETS.CIRCUIT]:
         'Чемпионат из трёх этапов: 3 очка против новичка, 5 на FLUX, 7 на Portal против эксперта. Проиграл матч — турнир завершён.',
+      [RULESETS.TRAINING]:
+        '60 секунд чистого игрового времени. Выберите тренировку, чтобы улучшить свою технику.',
     };
     const extras =
       this.elements.powerUpsSelect.value === 'on'
@@ -246,9 +274,11 @@ export class GameUI {
         : this.elements.arenaSelect.value === ARENAS.PORTAL
           ? ' Арена PORTAL: два связанных портала телепортируют мяч по полю.'
           : '';
-    this.elements.modeHint.textContent = circuit
-      ? `${controls} ${rules[ruleset]}`
-      : `${controls} ${rules[ruleset]}${extras}${arena}`;
+    this.elements.modeHint.textContent = training
+      ? `${controls} ${rules[ruleset]} ${DRILL_PROFILES[this.elements.trainingDrillSelect.value].description}`
+      : circuit
+        ? `${controls} ${rules[ruleset]}`
+        : `${controls} ${rules[ruleset]}${extras}${arena}`;
   }
 
   setHistory(history) {
@@ -262,16 +292,20 @@ export class GameUI {
         ? recent.map((result) => {
             const li = this.root.createElement('li');
             const label =
-              result.ruleset === RULESETS.CIRCUIT
-                ? 'Чемпионат'
+              result.ruleset === RULESETS.TRAINING
+                ? 'Тренировка'
+                : result.ruleset === RULESETS.CIRCUIT
+                  ? 'Чемпионат'
                 : result.ruleset === RULESETS.SURVIVAL
                   ? 'Испытание'
                   : result.mode === GAME_MODES.LOCAL
                     ? 'Дуэль'
                     : 'Соло';
             const outcome =
-              result.ruleset === RULESETS.CIRCUIT
-                ? result.winner === 'player'
+              result.ruleset === RULESETS.TRAINING
+                ? 'Завершено'
+                : result.ruleset === RULESETS.CIRCUIT
+                  ? result.winner === 'player'
                   ? 'Кубок'
                   : 'Вылет'
                 : result.ruleset === RULESETS.SURVIVAL
@@ -340,6 +374,37 @@ export class GameUI {
     this.elements.circuitHistory.replaceChildren(...entries);
   }
 
+  setTrainingRecords(records) {
+    const summary = summarizeTraining(records);
+    this.elements.trainingPrecisionBest.textContent = String(summary.best.precision);
+    this.elements.trainingRallyBest.textContent = String(summary.best.rally);
+    this.elements.trainingReflexBest.textContent = String(summary.best.reflex);
+    this.elements.trainingAttempts.textContent = String(summary.attempts);
+    const entries = summary.recent.map((record) => {
+      const li = this.root.createElement('li');
+      li.textContent = `${DRILL_PROFILES[record.drill].name} · ${record.points} очк. · серия ${record.bestStreak}`;
+      return li;
+    });
+    if (entries.length === 0) {
+      const li = this.root.createElement('li');
+      li.textContent = 'Заверши первую тренировку, чтобы установить рекорд.';
+      entries.push(li);
+    }
+    this.elements.trainingHistory.replaceChildren(...entries);
+  }
+
+  showTrainingReward(reward) {
+    this.elements.powerUpAlert.textContent = reward.kind === 'precision'
+      ? reward.accurate ? 'ТОЧНО В ЦЕЛЬ · +3!' : 'ПОПАДАНИЕ · +1'
+      : `СЕРИЯ ${reward.streak} · БОНУС +5!`;
+    this.elements.powerUpAlert.hidden = false;
+    if (this.alertTimeout !== null) window.clearTimeout(this.alertTimeout);
+    this.alertTimeout = window.setTimeout(() => {
+      this.elements.powerUpAlert.hidden = true;
+      this.alertTimeout = null;
+    }, 1300);
+  }
+
   showCircuitRound(stage) {
     this.elements.powerUpAlert.textContent = `ЭТАП ${stage.round}/${stage.total} — ${stage.stage.title.toUpperCase()}!`;
     this.elements.powerUpAlert.hidden = false;
@@ -371,11 +436,24 @@ export class GameUI {
 
   render(snapshot) {
     const elements = this.elements;
+    const training = snapshot.settings.ruleset === RULESETS.TRAINING;
+    elements.trainingMetric.hidden = !training;
+    if (training) {
+      elements.trainingPoints.textContent = String(snapshot.training.points);
+      elements.trainingClock.textContent = `${Math.ceil(snapshot.training.remainingSeconds)} С`;
+      elements.trainingDetails.textContent = snapshot.training.drill === 'precision'
+        ? `Цель: ${snapshot.training.target === 'top' ? 'ВЕРХ' : 'НИЗ'} · Точность ${snapshot.training.accuracy}%`
+        : snapshot.training.drill === 'rally'
+          ? `Серия: ${snapshot.training.streak} · Лучшее: ${snapshot.training.bestStreak}`
+          : `Жизни: ${snapshot.training.lives} · Защита: ${snapshot.training.saves}`;
+    }
     elements.playerScore.textContent = String(snapshot.score.player);
     elements.aiScore.textContent = String(snapshot.score.ai);
     const circuitMode = snapshot.settings.ruleset === RULESETS.CIRCUIT;
-    elements.aiLabel.textContent = circuitMode
-      ? snapshot.circuit.stage.title
+    elements.aiLabel.textContent = training
+      ? 'Тренер'
+      : circuitMode
+        ? snapshot.circuit.stage.title
       : snapshot.settings.ruleset === RULESETS.SURVIVAL
         ? 'Пропущено'
         : snapshot.settings.mode === GAME_MODES.LOCAL
@@ -420,6 +498,7 @@ export class GameUI {
       [RULESETS.TIME_ATTACK]: 'НА ВРЕМЯ',
       [RULESETS.SURVIVAL]: 'ВЫЖИВАНИЕ',
       [RULESETS.CIRCUIT]: 'ЧЕМПИОНАТ',
+      [RULESETS.TRAINING]: 'ТРЕНИРОВКА',
     }[snapshot.settings.ruleset];
     elements.matchClock.hidden = snapshot.settings.ruleset !== RULESETS.TIME_ATTACK;
     elements.matchClock.textContent = snapshot.overtime
@@ -448,8 +527,10 @@ export class GameUI {
     }
     if (snapshot.state === GAME_STATES.GAME_OVER) {
       const playerWon = snapshot.winner === 'player';
-      elements.resultTitle.textContent = circuitMode
-        ? snapshot.circuit.champion
+      elements.resultTitle.textContent = training
+        ? 'Тренировка завершена'
+        : circuitMode
+          ? snapshot.circuit.champion
           ? 'Ты чемпион PONC!'
           : 'Чемпионат завершён'
         : survival
@@ -459,8 +540,10 @@ export class GameUI {
             : playerWon
               ? 'Вы победили!'
               : 'Победил компьютер';
-      elements.resultScore.textContent = circuitMode
-        ? `Этапов пройдено: ${snapshot.circuit.completed}/3. ${snapshot.circuit.champion ? 'Кубок завоёван!' : 'Попробуй ещё раз.'}`
+      elements.resultScore.textContent = training
+        ? `${DRILL_PROFILES[snapshot.training.drill].name}: ${snapshot.training.points} очков. Лучший серия: ${snapshot.training.bestStreak}. ${snapshot.training.accuracy}% точности.`
+        : circuitMode
+          ? `Этапов пройдено: ${snapshot.circuit.completed}/3. ${snapshot.circuit.champion ? 'Кубок завоёван!' : 'Попробуй ещё раз.'}`
         : survival
           ? `Твой результат: ${snapshot.score.player} очков. Лучшая серия: ${snapshot.bestRally}`
           : `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}. Лучшая серия: ${snapshot.bestRally}`;
