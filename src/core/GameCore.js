@@ -204,7 +204,11 @@ export class GameCore {
       throw new Error(`Unknown scoring side: ${side}`);
     this.score[side] += 1;
     if (this.settings.ruleset === RULESETS.TRAINING) {
-      const reward = this.training.onGoal(side, this.model.ball.y, this.config.field.height);
+      const reward = this.training.onGoal(
+        side,
+        this.model.ball.y,
+        this.config.field.height,
+      );
       if (reward) this.events.emit(GAME_EVENTS.TRAINING_SCORE, reward);
       this.events.emit(GAME_EVENTS.GOAL, { side, score: { ...this.score } });
       if (this.training.drill === 'reflex' && this.training.lives === 0)

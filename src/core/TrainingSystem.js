@@ -11,7 +11,8 @@ export const DRILL_PROFILES = Object.freeze({
   [TRAINING_DRILLS.PRECISION]: Object.freeze({
     name: 'Меткость',
     difficulty: 'normal',
-    description: 'Попадайте в подсвеченную зону ворот. Точное попадание даёт 3 очка, обычное — 1.',
+    description:
+      'Попадайте в подсвеченную зону ворот. Точное попадание даёт 3 очка, обычное — 1.',
   }),
   [TRAINING_DRILLS.RALLY]: Object.freeze({
     name: 'Контроль',
@@ -21,7 +22,8 @@ export const DRILL_PROFILES = Object.freeze({
   [TRAINING_DRILLS.REFLEX]: Object.freeze({
     name: 'Реакция',
     difficulty: 'hard',
-    description: 'Отбивайте мячи эксперта: 2 очка за защиту. Три пропущенных мяча завершают тренировку.',
+    description:
+      'Отбивайте мячи эксперта: 2 очка за защиту. Три пропущенных мяча завершают тренировку.',
   }),
 });
 
@@ -77,8 +79,11 @@ export class TrainingSystem {
     if (side === 'player') {
       this.shots += 1;
       if (this.drill !== TRAINING_DRILLS.PRECISION) return null;
-      const accurate = Number.isFinite(ballY) && Number.isFinite(fieldHeight) &&
-        fieldHeight > 0 && (this.target === 'top'
+      const accurate =
+        Number.isFinite(ballY) &&
+        Number.isFinite(fieldHeight) &&
+        fieldHeight > 0 &&
+        (this.target === 'top'
           ? ballY <= fieldHeight * 0.34
           : ballY >= fieldHeight * 0.66);
       const points = accurate ? 3 : 1;

@@ -10,7 +10,9 @@ import {
   TrainingSystem,
 } from '../../src/core/TrainingSystem.js';
 import {
-  readTrainingRecords, saveTrainingRecord, summarizeTraining,
+  readTrainingRecords,
+  saveTrainingRecord,
+  summarizeTraining,
 } from '../../src/core/TrainingRecords.js';
 import { summarizeHistory } from '../../src/core/MatchHistory.js';
 import { unlockedAchievements } from '../../src/core/Achievements.js';
@@ -18,16 +20,19 @@ import { unlockedAchievements } from '../../src/core/Achievements.js';
 function start(drill = 'precision') {
   const core = new GameCore({ random: () => 0.75 });
   core.configure({
-    ruleset: RULESETS.TRAINING, drill, mode: 'local',
-    difficulty: 'easy', arena: 'portal', powerUps: true,
+    ruleset: RULESETS.TRAINING,
+    drill,
+    mode: 'local',
+    difficulty: 'easy',
+    arena: 'portal',
+    powerUps: true,
   });
   core.startMatch();
   core.step(core.config.match.countdownSeconds);
   return core;
 }
 function nextServe(core) {
-  if (core.state === GAME_STATES.COUNTDOWN)
-    core.step(core.config.match.countdownSeconds);
+  if (core.state === GAME_STATES.COUNTDOWN) core.step(core.config.match.countdownSeconds);
 }
 function fakeStorage() {
   const entries = new Map();
@@ -39,7 +44,11 @@ function fakeStorage() {
 
 test('training normalizes drill and enforces fair solo classic arena without powerups', () => {
   const settings = normalizeSettings({
-    ruleset: 'training', mode: 'local', arena: 'portal', powerUps: true, drill: 'bad',
+    ruleset: 'training',
+    mode: 'local',
+    arena: 'portal',
+    powerUps: true,
+    drill: 'bad',
   });
   assert.equal(settings.mode, 'solo');
   assert.equal(settings.arena, 'classic');
@@ -157,9 +166,21 @@ test('training records validate local data and track independent best results', 
   });
   assert.equal(readTrainingRecords(storage).length, 1);
   assert.deepEqual(readTrainingRecords({ getItem: () => 'broken' }), []);
-  assert.deepEqual(readTrainingRecords({
-    getItem: () => JSON.stringify([{ drill: 'precision', points: -9, bestStreak: 1, accuracy: 99, date: '2026-11-23' }]),
-  }), []);
+  assert.deepEqual(
+    readTrainingRecords({
+      getItem: () =>
+        JSON.stringify([
+          {
+            drill: 'precision',
+            points: -9,
+            bestStreak: 1,
+            accuracy: 99,
+            date: '2026-11-23',
+          },
+        ]),
+    }),
+    [],
+  );
 });
 
 test('training completion is not counted in normal win rate or achievements', () => {

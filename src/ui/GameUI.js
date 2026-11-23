@@ -136,7 +136,9 @@ export class GameUI {
       this.elements.powerUpsSelect.removeEventListener('change', modeChanged),
     );
     this.elements.trainingDrillSelect.addEventListener('change', modeChanged);
-    this.cleanup.push(() => this.elements.trainingDrillSelect.removeEventListener('change', modeChanged));
+    this.cleanup.push(() =>
+      this.elements.trainingDrillSelect.removeEventListener('change', modeChanged),
+    );
     this.elements.rulesetSelect.addEventListener('change', modeChanged);
     this.cleanup.push(() =>
       this.elements.rulesetSelect.removeEventListener('change', modeChanged),
@@ -296,23 +298,23 @@ export class GameUI {
                 ? 'Тренировка'
                 : result.ruleset === RULESETS.CIRCUIT
                   ? 'Чемпионат'
-                : result.ruleset === RULESETS.SURVIVAL
-                  ? 'Испытание'
-                  : result.mode === GAME_MODES.LOCAL
-                    ? 'Дуэль'
-                    : 'Соло';
+                  : result.ruleset === RULESETS.SURVIVAL
+                    ? 'Испытание'
+                    : result.mode === GAME_MODES.LOCAL
+                      ? 'Дуэль'
+                      : 'Соло';
             const outcome =
               result.ruleset === RULESETS.TRAINING
                 ? 'Завершено'
                 : result.ruleset === RULESETS.CIRCUIT
                   ? result.winner === 'player'
-                  ? 'Кубок'
-                  : 'Вылет'
-                : result.ruleset === RULESETS.SURVIVAL
-                  ? 'Рекорд'
-                  : result.winner === 'player'
-                    ? 'Победа'
-                    : 'Поражение';
+                    ? 'Кубок'
+                    : 'Вылет'
+                  : result.ruleset === RULESETS.SURVIVAL
+                    ? 'Рекорд'
+                    : result.winner === 'player'
+                      ? 'Победа'
+                      : 'Поражение';
             li.textContent = `${outcome} · ${result.playerScore}:${result.aiScore} · ${label}`;
             return li;
           })
@@ -394,9 +396,12 @@ export class GameUI {
   }
 
   showTrainingReward(reward) {
-    this.elements.powerUpAlert.textContent = reward.kind === 'precision'
-      ? reward.accurate ? 'ТОЧНО В ЦЕЛЬ · +3!' : 'ПОПАДАНИЕ · +1'
-      : `СЕРИЯ ${reward.streak} · БОНУС +5!`;
+    this.elements.powerUpAlert.textContent =
+      reward.kind === 'precision'
+        ? reward.accurate
+          ? 'ТОЧНО В ЦЕЛЬ · +3!'
+          : 'ПОПАДАНИЕ · +1'
+        : `СЕРИЯ ${reward.streak} · БОНУС +5!`;
     this.elements.powerUpAlert.hidden = false;
     if (this.alertTimeout !== null) window.clearTimeout(this.alertTimeout);
     this.alertTimeout = window.setTimeout(() => {
@@ -441,11 +446,12 @@ export class GameUI {
     if (training) {
       elements.trainingPoints.textContent = String(snapshot.training.points);
       elements.trainingClock.textContent = `${Math.ceil(snapshot.training.remainingSeconds)} С`;
-      elements.trainingDetails.textContent = snapshot.training.drill === 'precision'
-        ? `Цель: ${snapshot.training.target === 'top' ? 'ВЕРХ' : 'НИЗ'} · Точность ${snapshot.training.accuracy}%`
-        : snapshot.training.drill === 'rally'
-          ? `Серия: ${snapshot.training.streak} · Лучшее: ${snapshot.training.bestStreak}`
-          : `Жизни: ${snapshot.training.lives} · Защита: ${snapshot.training.saves}`;
+      elements.trainingDetails.textContent =
+        snapshot.training.drill === 'precision'
+          ? `Цель: ${snapshot.training.target === 'top' ? 'ВЕРХ' : 'НИЗ'} · Точность ${snapshot.training.accuracy}%`
+          : snapshot.training.drill === 'rally'
+            ? `Серия: ${snapshot.training.streak} · Лучшее: ${snapshot.training.bestStreak}`
+            : `Жизни: ${snapshot.training.lives} · Защита: ${snapshot.training.saves}`;
     }
     elements.playerScore.textContent = String(snapshot.score.player);
     elements.aiScore.textContent = String(snapshot.score.ai);
@@ -454,11 +460,11 @@ export class GameUI {
       ? 'Тренер'
       : circuitMode
         ? snapshot.circuit.stage.title
-      : snapshot.settings.ruleset === RULESETS.SURVIVAL
-        ? 'Пропущено'
-        : snapshot.settings.mode === GAME_MODES.LOCAL
-          ? 'Игрок 2'
-          : 'Компьютер';
+        : snapshot.settings.ruleset === RULESETS.SURVIVAL
+          ? 'Пропущено'
+          : snapshot.settings.mode === GAME_MODES.LOCAL
+            ? 'Игрок 2'
+            : 'Компьютер';
     elements.rallyValue.textContent = String(snapshot.rallyHits);
     elements.bestRallyValue.textContent = String(snapshot.bestRally);
     const survival = snapshot.settings.ruleset === RULESETS.SURVIVAL;
@@ -531,22 +537,22 @@ export class GameUI {
         ? 'Тренировка завершена'
         : circuitMode
           ? snapshot.circuit.champion
-          ? 'Ты чемпион PONC!'
-          : 'Чемпионат завершён'
-        : survival
-          ? 'Испытание завершено'
-          : snapshot.settings.mode === GAME_MODES.LOCAL
-            ? `Победил игрок ${playerWon ? '1' : '2'}!`
-            : playerWon
-              ? 'Вы победили!'
-              : 'Победил компьютер';
+            ? 'Ты чемпион PONC!'
+            : 'Чемпионат завершён'
+          : survival
+            ? 'Испытание завершено'
+            : snapshot.settings.mode === GAME_MODES.LOCAL
+              ? `Победил игрок ${playerWon ? '1' : '2'}!`
+              : playerWon
+                ? 'Вы победили!'
+                : 'Победил компьютер';
       elements.resultScore.textContent = training
         ? `${DRILL_PROFILES[snapshot.training.drill].name}: ${snapshot.training.points} очков. Лучшая серия: ${snapshot.training.bestStreak}. ${snapshot.training.accuracy}% точности.`
         : circuitMode
           ? `Этапов пройдено: ${snapshot.circuit.completed}/3. ${snapshot.circuit.champion ? 'Кубок завоёван!' : 'Попробуй ещё раз.'}`
-        : survival
-          ? `Твой результат: ${snapshot.score.player} очков. Лучшая серия: ${snapshot.bestRally}`
-          : `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}. Лучшая серия: ${snapshot.bestRally}`;
+          : survival
+            ? `Твой результат: ${snapshot.score.player} очков. Лучшая серия: ${snapshot.bestRally}`
+            : `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}. Лучшая серия: ${snapshot.bestRally}`;
     }
     document.documentElement.dataset.gameState = snapshot.state;
     document.documentElement.dataset.powerUps = String(snapshot.powerUps.enabled);

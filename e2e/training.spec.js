@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('academy enables precision drill, locks fair-play settings and shows live training HUD', async ({ page }) => {
+test('academy enables precision drill, locks fair-play settings and shows live training HUD', async ({
+  page,
+}) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
@@ -40,7 +42,9 @@ test('drills change description and persist after reload', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-ruleset', 'training');
 });
 
-test('reflex drill has expert difficulty and visible three-life progress', async ({ page }) => {
+test('reflex drill has expert difficulty and visible three-life progress', async ({
+  page,
+}) => {
   await page.goto('/');
   await page.locator('#rulesetSelect').selectOption('training');
   await page.locator('#trainingDrillSelect').selectOption('reflex');
@@ -50,14 +54,34 @@ test('reflex drill has expert difficulty and visible three-life progress', async
   await expect(page.locator('#fatalError')).toBeHidden();
 });
 
-test('personal academy records render separate best results per drill', async ({ page }) => {
+test('personal academy records render separate best results per drill', async ({
+  page,
+}) => {
   await page.addInitScript(() => {
     window.localStorage.setItem(
       'ponc:training-records:v1',
       JSON.stringify([
-        { drill: 'rally', points: 25, bestStreak: 10, accuracy: 0, date: '2026-11-23T00:00:00Z' },
-        { drill: 'precision', points: 12, bestStreak: 1, accuracy: 80, date: '2026-11-23T01:00:00Z' },
-        { drill: 'reflex', points: 18, bestStreak: 4, accuracy: 0, date: '2026-11-23T02:00:00Z' },
+        {
+          drill: 'rally',
+          points: 25,
+          bestStreak: 10,
+          accuracy: 0,
+          date: '2026-11-23T00:00:00Z',
+        },
+        {
+          drill: 'precision',
+          points: 12,
+          bestStreak: 1,
+          accuracy: 80,
+          date: '2026-11-23T01:00:00Z',
+        },
+        {
+          drill: 'reflex',
+          points: 18,
+          bestStreak: 4,
+          accuracy: 0,
+          date: '2026-11-23T02:00:00Z',
+        },
       ]),
     );
   });

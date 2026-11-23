@@ -82,7 +82,8 @@ export class CanvasRenderer {
     }
     if (snapshot.arena?.hazard) this.drawArenaHazard(snapshot.arena.hazard);
     if (snapshot.arena?.portals) this.drawPortals(snapshot.arena.portals);
-    if (snapshot.training?.enabled) this.drawTrainingOverlay(snapshot.training, snapshot.field);
+    if (snapshot.training?.enabled)
+      this.drawTrainingOverlay(snapshot.training, snapshot.field);
     if (snapshot.settings.ruleset === 'survival')
       this.drawSurvivalIndicator(snapshot.survivalLives);
     this.drawBall(snapshot.ball);
