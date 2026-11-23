@@ -20,4 +20,10 @@ export const GAME_EVENTS = Object.freeze({
   RESUMED: 'game:resumed',
   GAME_OVER: 'game:over',
   RESET: 'game:reset',
+  POWER_UP_COLLECTED: 'powerup:collected',
+  POWER_UP_SHIELD: 'powerup:shield',
+  ARENA_BOUNCE: 'arena:bounce',
+  ARENA_PORTAL: 'arena:portal',
+  CIRCUIT_ROUND: 'circuit:round',
+  TRAINING_SCORE: 'training:score',
 });
