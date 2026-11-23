@@ -541,7 +541,7 @@ export class GameUI {
               ? 'Вы победили!'
               : 'Победил компьютер';
       elements.resultScore.textContent = training
-        ? `${DRILL_PROFILES[snapshot.training.drill].name}: ${snapshot.training.points} очков. Лучший серия: ${snapshot.training.bestStreak}. ${snapshot.training.accuracy}% точности.`
+        ? `${DRILL_PROFILES[snapshot.training.drill].name}: ${snapshot.training.points} очков. Лучшая серия: ${snapshot.training.bestStreak}. ${snapshot.training.accuracy}% точности.`
         : circuitMode
           ? `Этапов пройдено: ${snapshot.circuit.completed}/3. ${snapshot.circuit.champion ? 'Кубок завоёван!' : 'Попробуй ещё раз.'}`
         : survival

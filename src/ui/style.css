@@ -836,3 +836,11 @@ html[data-ruleset='circuit'] .scoreboard {
 html[data-ruleset='training'] .scoreboard{background:#142d34;border-color:#4da79a}
 html[data-ruleset='training'] .game-stage{border-color:#5ebca9;box-shadow:0 18px 60px #174b4970}
 @media(max-width:460px){.academy-section{padding:14px}.academy-record-grid>div{padding:8px}.academy-record-grid span{font-size:9px}.academy-record-grid small{font-size:9px}.academy-mark{font-size:42px}}
+
+/* Hidden elements must not be unhidden by author display declarations. */
+#trainingMetric[hidden],
+#trainingDrillField[hidden],
+#circuitRoute[hidden],
+#trainingDrillSelect[hidden] {
+  display: none !important;
+}
