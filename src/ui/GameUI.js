@@ -243,7 +243,9 @@ export class GameUI {
     const arena =
       this.elements.arenaSelect.value === ARENAS.FLUX
         ? ' Арена FLUX: движущийся центральный отражатель меняет траекторию мяча.'
-        : '';
+        : this.elements.arenaSelect.value === ARENAS.PORTAL
+          ? ' Арена PORTAL: два связанных портала телепортируют мяч по полю.'
+          : '';
     this.elements.modeHint.textContent = circuit
       ? `${controls} ${rules[ruleset]}`
       : `${controls} ${rules[ruleset]}${extras}${arena}`;
