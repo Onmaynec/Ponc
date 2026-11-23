@@ -27,6 +27,8 @@ export class SoundSystem {
       power: [1100, 0.21, 'triangle'],
       shield: [220, 0.24, 'sawtooth'],
       bumper: [520, 0.1, 'square'],
+      portal: [790, 0.14, 'sine'],
+      round: [940, 0.24, 'triangle'],
     };
     const [frequency, duration, waveform] = presets[type] || presets.paddle;
     try {
