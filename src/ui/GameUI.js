@@ -3,6 +3,7 @@ import { GAME_STATES } from '../core/constants.js';
 import { normalizeSettings, GAME_MODES, RULESETS } from '../core/MatchSettings.js';
 import { summarizeHistory } from '../core/MatchHistory.js';
 import { summarizeSurvival } from '../core/SurvivalRecords.js';
+import { summarizeCircuit } from '../core/CircuitRecords.js';
 import { ARENAS } from '../systems/ArenaSystem.js';
 
 const STATE_LABELS = Object.freeze({
@@ -45,6 +46,13 @@ export class GameUI {
       'powerUpsSelect',
       'arenaSelect',
       'arenaMetric',
+      'circuitMetric',
+      'circuitStage',
+      'circuitRoute',
+      'circuitBest',
+      'circuitTrophies',
+      'circuitAttempts',
+      'circuitHistory',
       'survivalMetric',
       'survivalLives',
       'survivalBest',
@@ -205,9 +213,16 @@ export class GameUI {
   }
 
   updateModeHint() {
+    const ruleset = this.elements.rulesetSelect.value;
+    const circuit = ruleset === RULESETS.CIRCUIT;
+    if (circuit) this.elements.modeSelect.value = GAME_MODES.SOLO;
+    this.elements.modeSelect.disabled = circuit;
+    this.elements.difficultySelect.disabled = circuit;
+    this.elements.arenaSelect.disabled = circuit;
+    this.elements.powerUpsSelect.disabled = circuit;
+    this.elements.circuitRoute.hidden = !circuit;
     const local = this.elements.modeSelect.value === GAME_MODES.LOCAL;
     this.elements.difficultyField.hidden = local;
-    const ruleset = this.elements.rulesetSelect.value;
     this.elements.winningScoreField.hidden = ruleset !== RULESETS.CLASSIC;
     const controls = local
       ? 'Игрок 1: W / S · Игрок 2: ↑ / ↓. На телефоне — два касания по сторонам поля.'
@@ -218,6 +233,8 @@ export class GameUI {
       [RULESETS.TIME_ATTACK]: '90 секунд активной игры. При ничьей — решающее очко.',
       [RULESETS.SURVIVAL]:
         'Испытание: забивай как можно больше, пока не пропустишь три мяча. Рекорд в одиночном режиме.',
+      [RULESETS.CIRCUIT]:
+        'Чемпионат из трёх этапов: 3 очка против новичка, 5 на FLUX, 7 на Portal против эксперта. Проиграл матч — турнир завершён.',
     };
     const extras =
       this.elements.powerUpsSelect.value === 'on'
@@ -227,7 +244,9 @@ export class GameUI {
       this.elements.arenaSelect.value === ARENAS.FLUX
         ? ' Арена FLUX: движущийся центральный отражатель меняет траекторию мяча.'
         : '';
-    this.elements.modeHint.textContent = `${controls} ${rules[ruleset]}${extras}${arena}`;
+    this.elements.modeHint.textContent = circuit
+      ? `${controls} ${rules[ruleset]}`
+      : `${controls} ${rules[ruleset]}${extras}${arena}`;
   }
 
   setHistory(history) {
@@ -241,14 +260,18 @@ export class GameUI {
         ? recent.map((result) => {
             const li = this.root.createElement('li');
             const label =
-              result.ruleset === RULESETS.SURVIVAL
-                ? 'Испытание'
+              result.ruleset === RULESETS.CIRCUIT
+                ? 'Чемпионат'
+                : result.ruleset === RULESETS.SURVIVAL
+                  ? 'Испытание'
                 : result.mode === GAME_MODES.LOCAL
                   ? 'Дуэль'
                   : 'Соло';
             const outcome =
-              result.ruleset === RULESETS.SURVIVAL
-                ? 'Рекорд'
+              result.ruleset === RULESETS.CIRCUIT
+                ? (result.winner === 'player' ? 'Кубок' : 'Вылет')
+                : result.ruleset === RULESETS.SURVIVAL
+                  ? 'Рекорд'
                 : result.winner === 'player'
                   ? 'Победа'
                   : 'Поражение';
@@ -293,6 +316,37 @@ export class GameUI {
     this.elements.survivalLeaderboard.replaceChildren(...top);
   }
 
+  setCircuitRecords(records) {
+    const summary = summarizeCircuit(records);
+    this.elements.circuitBest.textContent = `${summary.best}/3`;
+    this.elements.circuitTrophies.textContent = String(summary.trophies);
+    this.elements.circuitAttempts.textContent = String(summary.attempts);
+    const entries = summary.recent.map((record) => {
+      const li = this.root.createElement('li');
+      li.textContent = record.champion
+        ? '★ ЧЕМПИОН · Все 3 этапа пройдены'
+        : `Этапов пройдено: ${record.completed}/3`;
+      return li;
+    });
+    if (entries.length === 0) {
+      const li = this.root.createElement('li');
+      li.textContent = 'Заверши чемпионат, чтобы записать результат.';
+      entries.push(li);
+    }
+    this.elements.circuitHistory.replaceChildren(...entries);
+  }
+
+  showCircuitRound(stage) {
+    this.elements.powerUpAlert.textContent =
+      `ЭТАП ${stage.round}/${stage.total} — ${stage.stage.title.toUpperCase()}!`;
+    this.elements.powerUpAlert.hidden = false;
+    if (this.alertTimeout !== null) window.clearTimeout(this.alertTimeout);
+    this.alertTimeout = window.setTimeout(() => {
+      this.elements.powerUpAlert.hidden = true;
+      this.alertTimeout = null;
+    }, 2000);
+  }
+
   showPowerUp({ type, side, shield = false }) {
     const names = { expand: 'РАКЕТКА XL', turbo: 'ТУРБО', shield: 'ЭНЕРГОЩИТ' };
     const playerName = side === 'player' ? 'Игрок 1' : 'Игрок 2 / ИИ';
@@ -316,18 +370,28 @@ export class GameUI {
     const elements = this.elements;
     elements.playerScore.textContent = String(snapshot.score.player);
     elements.aiScore.textContent = String(snapshot.score.ai);
+    const circuitMode = snapshot.settings.ruleset === RULESETS.CIRCUIT;
     elements.aiLabel.textContent =
-      snapshot.settings.ruleset === RULESETS.SURVIVAL
-        ? 'Пропущено'
+      circuitMode
+        ? snapshot.circuit.stage.title
+        : snapshot.settings.ruleset === RULESETS.SURVIVAL
+          ? 'Пропущено'
         : snapshot.settings.mode === GAME_MODES.LOCAL
           ? 'Игрок 2'
           : 'Компьютер';
     elements.rallyValue.textContent = String(snapshot.rallyHits);
     elements.bestRallyValue.textContent = String(snapshot.bestRally);
     const survival = snapshot.settings.ruleset === RULESETS.SURVIVAL;
-    elements.arenaMetric.textContent = snapshot.arena.enabled
-      ? `FLUX · ОТРАЖЕНИЯ ${snapshot.arena.totalBounces}`
-      : 'АРЕНА CLASSIC';
+    elements.arenaMetric.textContent = snapshot.arena.mode === ARENAS.PORTAL
+      ? `PORTAL · ТЕЛЕПОРТЫ ${snapshot.arena.totalTeleports}`
+      : snapshot.arena.mode === ARENAS.FLUX
+        ? `FLUX · ОТРАЖЕНИЯ ${snapshot.arena.totalBounces}`
+        : 'АРЕНА CLASSIC';
+    elements.circuitMetric.hidden = !circuitMode;
+    if (circuitMode) {
+      elements.circuitStage.textContent =
+        `${snapshot.circuit.round}/${snapshot.circuit.total} · ${snapshot.circuit.stage.title} · до ${snapshot.settings.winningScore}`;
+    }
     elements.survivalMetric.hidden = !survival;
     elements.survivalLives.textContent = String(snapshot.survivalLives);
     elements.powerUpInfo.hidden = !snapshot.powerUps.enabled;
@@ -353,6 +417,7 @@ export class GameUI {
       [RULESETS.SUDDEN_DEATH]: 'РЕШАЮЩЕЕ ОЧКО',
       [RULESETS.TIME_ATTACK]: 'НА ВРЕМЯ',
       [RULESETS.SURVIVAL]: 'ВЫЖИВАНИЕ',
+      [RULESETS.CIRCUIT]: 'ЧЕМПИОНАТ',
     }[snapshot.settings.ruleset];
     elements.matchClock.hidden = snapshot.settings.ruleset !== RULESETS.TIME_ATTACK;
     elements.matchClock.textContent = snapshot.overtime
@@ -381,15 +446,19 @@ export class GameUI {
     }
     if (snapshot.state === GAME_STATES.GAME_OVER) {
       const playerWon = snapshot.winner === 'player';
-      elements.resultTitle.textContent = survival
-        ? 'Испытание завершено'
+      elements.resultTitle.textContent = circuitMode
+        ? snapshot.circuit.champion ? 'Ты чемпион PONC!' : 'Чемпионат завершён'
+        : survival
+          ? 'Испытание завершено'
         : snapshot.settings.mode === GAME_MODES.LOCAL
           ? `Победил игрок ${playerWon ? '1' : '2'}!`
           : playerWon
             ? 'Вы победили!'
             : 'Победил компьютер';
-      elements.resultScore.textContent = survival
-        ? `Твой результат: ${snapshot.score.player} очков. Лучшая серия: ${snapshot.bestRally}`
+      elements.resultScore.textContent = circuitMode
+        ? `Этапов пройдено: ${snapshot.circuit.completed}/3. ${snapshot.circuit.champion ? 'Кубок завоёван!' : 'Попробуй ещё раз.'}`
+        : survival
+          ? `Твой результат: ${snapshot.score.player} очков. Лучшая серия: ${snapshot.bestRally}`
         : `Финальный счёт: ${snapshot.score.player}:${snapshot.score.ai}. Лучшая серия: ${snapshot.bestRally}`;
     }
     document.documentElement.dataset.gameState = snapshot.state;

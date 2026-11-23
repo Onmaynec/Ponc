@@ -80,10 +80,33 @@ export class CanvasRenderer {
       this.drawPowerUp(snapshot.powerUps.pickup);
       this.drawShield(snapshot.powerUps.shield, snapshot.field);
     }
-    if (snapshot.arena?.enabled) this.drawArenaHazard(snapshot.arena.hazard);
+    if (snapshot.arena?.hazard) this.drawArenaHazard(snapshot.arena.hazard);
+    if (snapshot.arena?.portals) this.drawPortals(snapshot.arena.portals);
     if (snapshot.settings.ruleset === 'survival')
       this.drawSurvivalIndicator(snapshot.survivalLives);
     this.drawBall(snapshot.ball);
+  }
+
+  drawPortals(portals) {
+    const ctx = this.context;
+    const colors = ['#7d8bff', '#f185d7'];
+    portals.forEach((portal, index) => {
+      ctx.save();
+      ctx.strokeStyle = colors[index];
+      ctx.shadowColor = colors[index];
+      ctx.shadowBlur = 25;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(portal.x, portal.y, portal.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#d8e5ffac';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(portal.x, portal.y, portal.radius - 7, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    });
   }
 
   drawArenaHazard(hazard) {
